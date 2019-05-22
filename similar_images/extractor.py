@@ -2,65 +2,49 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from PIL import Image
 import torchvision
 import torchvision.datasets as datasets
+
 import torchvision.transforms as transforms
 import torch.utils.data as utils
+from torch.utils.data.dataset import Dataset
 
+from similar_images.models import Autoencoder
 
-class Autoencoder(nn.Module):
-    def __init__(self, z_dim=32):
-        super(Autoencoder, self).__init__()
+class PILDataset(Dataset):
+    """PIL dataset."""
 
-        self.z_dim = z_dim
-        self.conv1 = nn.Conv2d(1, 32, kernel_size=3)  # 46x46
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)  # 44x44
-        self.maxpool1 = nn.MaxPool2d(2)  # 22x22
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3)  # 20x20
-        self.maxpool2 = nn.MaxPool2d(2)  # 10x10
-        self.conv4 = nn.Conv2d(128, 256, kernel_size=3)
-        self.fc1 = nn.Linear(64 * 16 * 16, z_dim)
+    def __init__(self, csv_file, root_dir, transform=None):
+        """
+        Args:
+            csv_file (string): Path to the csv file with annotations.
+            root_dir (string): Directory with all the images.
+            transform (callable, optional): Optional transform to be applied
+                on a sample.
+        """
+        self.landmarks_frame = pd.read_csv(csv_file)
+        self.root_dir = root_dir
+        self.transform = transform
 
-        # decoder
-        self.fc2 = nn.Linear(z_dim, 64 * 22 * 22)
-        self.convT1 = nn.ConvTranspose2d(16, 16, kernel_size=3)
-        self.convT2 = nn.ConvTranspose2d(16, 1, kernel_size=3)
+    def __len__(self):
+        return len(self.landmarks_frame)
 
-    def forward(self, x):
-        x = self.conv1(x)
-        x = F.relu(x)
-        x = self.conv2(x)
-        x = F.relu(x)
-        x = self.maxpool1(x)
-        x = self.conv3(x)
-        x = F.relu(x)
-        x = self.maxpool2(x)
-        x = self.conv4(x)
-        x = F.relu(x)
+    def __getitem__(self, idx):
+        img_name = os.path.join(self.root_dir,
+                                self.landmarks_frame.iloc[idx, 0])
+        image = io.imread(img_name)
+        landmarks = self.landmarks_frame.iloc[idx, 1:].as_matrix()
+        landmarks = landmarks.astype('float').reshape(-1, 2)
+        sample = {'image': image, 'landmarks': landmarks}
 
-        x = x.view(x.size(0), -1)
-        x = self.fc1(x)
-        return self.decode(x)
+        if self.transform:
+            sample = self.transform(sample)
 
-    def decode(self, x):
-        embedding = x
-        x = self.fc2(x)
-        x = x.view(x.size(0), 16, 44, 44)
-        x = self.convT1(x)
-        x = F.relu(x)
-        x = self.convT2(x)
-        x = torch.sigmoid(x)
-        return x, embedding
-
+        return sample
 
 class EmbeddingExtractor:
     def __init__(self, data_dir=None, array=None, num_channels=1, num_epochs=2, batch_size=32, show_train=True):
-        self.transform = transforms.Compose([transforms.ToTensor(),
-                                             transforms.RandomHorizontalFlip(),
-                                             transforms.Normalize((0.5), (0.25))])
-
         self.num_epochs = num_epochs
         self.batch_size = batch_size
         self.show_train = show_train
@@ -68,7 +52,7 @@ class EmbeddingExtractor:
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.num_channels = num_channels
 
-        data_transforms = transforms.Compose([transforms.Resize(48),
+        data_transforms = transforms.Compose([transforms.Resize(50),
                                               transforms.CenterCrop(48),
                                               transforms.RandomHorizontalFlip(),
                                               transforms.ToTensor(),
@@ -82,12 +66,11 @@ class EmbeddingExtractor:
                                                           num_workers=4)
         elif array is not None:
             assert isinstance(array, np.ndarray)
-            self.dataloader = self.tensor_dataloader(array)
+            self.dataloader = self.tensor_dataloader(array, data_transforms)
 
         self.model = Autoencoder()
         if torch.cuda.device_count() > 1:
             print("Let's use", torch.cuda.device_count(), "GPUs!")
-            # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
             model = nn.DataParallel(self.model)
 
         self.model.to(self.device)
@@ -96,14 +79,14 @@ class EmbeddingExtractor:
 
         self.train()
 
-    def tensor_dataloader(self, array):
+    def tensor_dataloader(self, array, transforms):
         print(f"INFO: data shape: {array.shape} (Target: N x C x H x W)")
         if array.ndim == 3:
             print(f"Converting to grayscale dataset of dims {array.shape[0]} x 1 x {array.shape[1]} x {array.shape[2]}")
             array = array[:, np.newaxis, ...]
             print(f"New shape: {array.shape}")
-        tensors = torch.stack([torch.Tensor(arr) for arr in array])  # transform to torch tensors
-        dataset = utils.TensorDataset(tensors)  # create your datset
+        tensor = torch.Tensor(array)
+        dataset = transforms.functional.to_pil_image(tensor)
         dataloader = utils.DataLoader(dataset, batch_size=self.batch_size, shuffle=False)  # create your dataloader
         return dataloader
 

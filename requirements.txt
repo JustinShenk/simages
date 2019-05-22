@@ -1,4 +1,5 @@
-closest_pairs
+torch
+closely
 scikit-learn
 numpy
 Pillow

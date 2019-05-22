@@ -2,9 +2,11 @@ import os
 import glob
 from typing import Union
 
-import closest_pairs
+import closely
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
+import torchvision
 
 from similar_images import EmbeddingExtractor
 
@@ -37,7 +39,7 @@ class Embeddings():
 
     def duplicates(self, n:int=5):
         assert isinstance(self.embeddings, np.ndarray)
-        self.pairs, self.distances = closest_pairs.solve(self.embeddings, n=n)
+        self.pairs, self.distances = closely.solve(self.embeddings, n=n)
 
         return self.pairs, self.distances
 
@@ -72,4 +74,4 @@ class Embeddings():
         # Plot pairs
         for pair in self.pairs:
             img_arr = self.embeddings.extractor.dataloader.dataset[pair][0].cpu()
-            show(torchvision.utils.make_grid(img_arr), title=pair)
+            self.show(torchvision.utils.make_grid(img_arr), title=pair)
