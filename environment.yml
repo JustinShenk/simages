@@ -1,0 +1,12 @@
+name: similar_images
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - scikit-learn
+  - numpy
+  - matplotlib
+  - torchvision
+  - torch
+
+
