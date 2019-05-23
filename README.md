@@ -1,4 +1,4 @@
-# Similar Images :photo:
+# Similar Images :see-no-evil monkey:
 
 Find similar images within a dataset. Useful for finding duplicates images.
 
