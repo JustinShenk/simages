@@ -5,38 +5,31 @@ import torch.nn as nn
 from PIL import Image
 import torchvision
 import torchvision.datasets as datasets
-
 import torchvision.transforms as transforms
+import torchvision.transforms.functional as TF
 import torch.utils.data as utils
 from torch.utils.data.dataset import Dataset
 
-from similar_images.models import Autoencoder
+from .models import Autoencoder
 
 class PILDataset(Dataset):
     """PIL dataset."""
 
-    def __init__(self, csv_file, root_dir, transform=None):
+    def __init__(self, pil_list, transform=None):
         """
         Args:
-            csv_file (string): Path to the csv file with annotations.
-            root_dir (string): Directory with all the images.
+            pil_list (list of PIL images)
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        self.landmarks_frame = pd.read_csv(csv_file)
-        self.root_dir = root_dir
+        self.pil_list = pil_list
         self.transform = transform
 
     def __len__(self):
-        return len(self.landmarks_frame)
+        return len(self.pil_list)
 
     def __getitem__(self, idx):
-        img_name = os.path.join(self.root_dir,
-                                self.landmarks_frame.iloc[idx, 0])
-        image = io.imread(img_name)
-        landmarks = self.landmarks_frame.iloc[idx, 1:].as_matrix()
-        landmarks = landmarks.astype('float').reshape(-1, 2)
-        sample = {'image': image, 'landmarks': landmarks}
+        sample = self.pil_list[idx]
 
         if self.transform:
             sample = self.transform(sample)
@@ -86,7 +79,8 @@ class EmbeddingExtractor:
             array = array[:, np.newaxis, ...]
             print(f"New shape: {array.shape}")
         tensor = torch.Tensor(array)
-        dataset = transforms.functional.to_pil_image(tensor)
+        pil_list = [TF.to_pil_image(array) for array in tensor]
+        dataset = PILDataset(pil_list, transform=transforms)
         dataloader = utils.DataLoader(dataset, batch_size=self.batch_size, shuffle=False)  # create your dataloader
         return dataloader
 
@@ -110,7 +104,7 @@ class EmbeddingExtractor:
     def train(self):
         for epoch in range(self.num_epochs):
             embeddings = []
-            for data, in self.dataloader:
+            for data in self.dataloader:
                 img = data.to(self.device)
                 # ===================forward=====================
                 output, embedding = self.model(img)

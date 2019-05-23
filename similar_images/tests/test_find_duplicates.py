@@ -10,4 +10,4 @@ from similar_images import find_duplicates
 def test_import(hw):
     data = np.random.random((100, hw, hw))
     data = data[:, np.newaxis, ...]
-    find_duplicates(data)
+    find_duplicates(data, show_train=False)

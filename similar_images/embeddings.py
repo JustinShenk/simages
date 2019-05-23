@@ -8,12 +8,12 @@ import numpy as np
 import torch
 import torchvision
 
-from similar_images import EmbeddingExtractor
+from .extractor import EmbeddingExtractor
 
 
 class Embeddings():
     """Create embeddings from `input` data."""
-    def __init__(self, input:Union[np.ndarray, str]):
+    def __init__(self, input:Union[np.ndarray, str], **kwargs):
         if isinstance(input, str):
             if os.path.isdir(input):
                 self.data_dir = input
@@ -25,11 +25,11 @@ class Embeddings():
 
                 # Assume they are images
                 if len(files):
-                    self.embeddings = self.images_to_embeddings(self.data_dir)
+                    self.embeddings = self.images_to_embeddings(self.data_dir, **kwargs)
                 else:
                     raise Exception(f"Files count is {len(files)}")
         elif isinstance(input, np.ndarray):
-            self.embeddings = self.array_to_embeddings(input)
+            self.embeddings = self.array_to_embeddings(input, **kwargs)
         else:
             raise NotImplementedError(f"{type(input)}")
 
@@ -43,12 +43,12 @@ class Embeddings():
 
         return self.pairs, self.distances
 
-    def images_to_embeddings(self, data_dir:str):
-        self.extractor = EmbeddingExtractor(data_dir=data_dir)
+    def images_to_embeddings(self, data_dir:str, **kwargs):
+        self.extractor = EmbeddingExtractor(data_dir=data_dir, **kwargs)
         return self.extractor.embeddings
 
-    def array_to_embeddings(self, array:np.ndarray):
-        self.extractor = EmbeddingExtractor(array=array)
+    def array_to_embeddings(self, array:np.ndarray, **kwargs):
+        self.extractor = EmbeddingExtractor(array=array, **kwargs)
         return self.extractor.embeddings
 
     def __repr__(self):

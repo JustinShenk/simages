@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.functional as F
+import torch.nn.functional as F
 
 class Autoencoder(nn.Module):
     def __init__(self, z_dim=32):
@@ -21,27 +21,18 @@ class Autoencoder(nn.Module):
         self.convT2 = nn.ConvTranspose2d(16, 1, kernel_size=3)
 
     def forward(self, x):
-        print("A", x.shape)
         x = self.conv1(x)
-        print("B", x.shape)
         x = F.relu(x)
         x = self.conv2(x)
-        print("C", x.shape)
         x = F.relu(x)
         x = self.maxpool1(x)
-        print("D", x.shape)
         x = self.conv3(x)
         x = F.relu(x)
-        print("E", x.shape)
         x = self.maxpool2(x)
-        print("F", x.shape)
         x = self.conv4(x)
-        print("G", x.shape)
         x = F.relu(x)
         x = x.view(x.size(0), -1)
-        print("H", x.shape)
         x = self.fc1(x)
-        print("I", x.shape)
         return self.decode(x)
 
     def decode(self, x):
