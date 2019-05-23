@@ -1,4 +1,4 @@
-# Similar Images :see-no-evil monkey:
+# Simages: Find similar images :see-no-evil monkey:
 
 Find similar images within a dataset. Useful for finding duplicates images.
 
@@ -26,6 +26,9 @@ pairs, distances = simages.
 
 You can specify how many pairs you want to identify with `n`.
  
+### How it works
+
+Simages uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely).
 
 ### Example
 ```python
