@@ -59,10 +59,15 @@ class Embeddings():
             npimg = img.numpy()
         else:
             raise NotImplementedError(f"{type(img)}")
+
         plt.subplots()
         plt.title(title)
         plt.imshow(np.transpose(npimg,(1,2,0)).squeeze(), interpolation='nearest')
         plt.show()
+
+    def show_images(self, indices, title=""):
+        tensors = [self.extractor.dataloader.dataset[idx].cpu() for idx in indices]
+        self.show(torchvision.utils.make_grid(tensors), title=title)
 
     def show_duplicates(self, n=5):
         if not hasattr(self, "pairs"):
@@ -72,6 +77,8 @@ class Embeddings():
             self.pairs, self.distances = self.duplicates(n=n)
 
         # Plot pairs
+        imgs = []
         for pair in self.pairs:
-            img_arr = self.embeddings.extractor.dataloader.dataset[pair][0].cpu()
-            self.show(torchvision.utils.make_grid(img_arr), title=pair)
+            img0 = self.extractor.dataloader.dataset[pair[0]].cpu()
+            img1 = self.extractor.dataloader.dataset[pair[1]].cpu()
+            self.show(torchvision.utils.make_grid([img0, img1]), title=pair)

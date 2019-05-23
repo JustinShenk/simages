@@ -61,25 +61,18 @@ class BasicAutoencoder(nn.Module):
 
     def forward(self, x):
         x = self.conv1(x)
-        print("A", x.shape)
         x = F.relu(x)
         x = self.conv2(x)
-        print("B", x.shape)
         x = F.relu(x)
         x = self.maxpool1(x)
-        print("C", x.shape)
         x = x.view(x.size(0), -1)
         x = self.fc1(x)
-        print("D", x.shape)
         return self.decode(x)
 
     def decode(self, x):
         embedding = x
         x = self.fc2(x)
-        print("E", x.shape)
         x = x.view(x.size(0), 16, 44, 44)
         x = self.convT1(x)
-        print("F", x.shape)
-        x = F.relu(x)
         x = torch.sigmoid(x)
         return x, embedding

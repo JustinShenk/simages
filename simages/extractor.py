@@ -47,7 +47,6 @@ class EmbeddingExtractor:
 
         data_transforms = transforms.Compose([transforms.Resize(50),
                                               transforms.CenterCrop(48),
-                                              transforms.RandomHorizontalFlip(),
                                               transforms.ToTensor(),
                                               transforms.Normalize([0.5] * num_channels, [0.25] * num_channels)])
 
@@ -83,8 +82,9 @@ class EmbeddingExtractor:
             print(f"Converting to grayscale dataset of dims {array.shape[0]} x 1 x {array.shape[1]} x {array.shape[2]}")
             array = array[:, np.newaxis, ...]
             print(f"New shape: {array.shape}")
+
         tensor = torch.Tensor(array)
-        pil_list = [TF.to_pil_image(array) for array in tensor]
+        pil_list = [TF.to_pil_image(array.squeeze()) for array in tensor]
         dataset = PILDataset(pil_list, transform=transforms)
         dataloader = utils.DataLoader(dataset, batch_size=self.batch_size, shuffle=False)  # create your dataloader
         return dataloader
