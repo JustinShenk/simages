@@ -10,7 +10,7 @@ import torchvision.transforms.functional as TF
 import torch.utils.data as utils
 from torch.utils.data.dataset import Dataset
 
-from .models import Autoencoder
+from .models import BasicAutoencoder, Autoencoder
 
 class PILDataset(Dataset):
     """PIL dataset."""
@@ -61,7 +61,12 @@ class EmbeddingExtractor:
             assert isinstance(array, np.ndarray)
             self.dataloader = self.tensor_dataloader(array, data_transforms)
 
-        self.model = Autoencoder()
+        if not torch.cuda.is_available():
+            print("Note: No GPU found, using CPU. Performance is improved on a CUDA-device.")
+            self.model = BasicAutoencoder()
+        else:
+            self.model = Autoencoder()
+
         if torch.cuda.device_count() > 1:
             print("Let's use", torch.cuda.device_count(), "GPUs!")
             model = nn.DataParallel(self.model)
