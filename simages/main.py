@@ -1,6 +1,6 @@
 import numpy as np
 
-from similar_images import Embeddings
+from simages import Embeddings
 
 def find_duplicates(array: np.ndarray, n:int=5, show_train=True, **kwargs):
     embeddings = Embeddings(array, show_train=show_train, **kwargs)

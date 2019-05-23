@@ -4,7 +4,7 @@ matplotlib.use("Agg")
 import numpy as np
 import pytest
 
-from similar_images import find_duplicates
+from simages import find_duplicates
 
 @pytest.mark.parametrize("hw",[48,64,128])
 def test_import(hw):

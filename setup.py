@@ -23,17 +23,17 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
-requirements = ["numpy", "scikit-learn", "torch", "torchvision", "Pillow", "closest_pairs"]
+requirements = ["numpy", "scikit-learn", "torch", "torchvision", "Pillow", "closely"]
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_dir, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="similar_images",
-    version=find_version("similar_images", "__init__.py"),
+    name="simages",
+    version=find_version("simages", "__init__.py"),
     description="Find similar images (duplicates) in a dataset",
-    url="https://github.com/justinshenk/similar-images",
+    url="https://github.com/justinshenk/simages",
     author="Justin Shenk",
     author_email="shenkjustin@gmail.com",
     long_description=long_description,

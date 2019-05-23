@@ -5,23 +5,23 @@ Find similar images within a dataset. Useful for finding duplicates images.
 ### Getting Started
 
 ```bash
-pip install similar_images
+pip install simages
 ```
 
 or install from source:
 ```bash
-git clone https://github.com/justinshenk/similar_images
-cd similar_images
+git clone https://github.com/justinshenk/simages
+cd simages
 pip install .
 ```
 
 ### How to use
 
 ```python
-import similar_images
+import simages
 
 # X is an n x m numpy array
-pairs, distances = similar_images.
+pairs, distances = simages.
 ```
 
 You can specify how many pairs you want to identify with `n`.
