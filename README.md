@@ -1,4 +1,4 @@
-# Simages: Find similar images :monkey_face: | :monkey_face:
+# Simages: Find similar images :monkey_face: :monkey_face:
 
 Find similar images within a dataset. Useful for finding duplicates images.
 
