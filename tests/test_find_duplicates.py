@@ -20,5 +20,5 @@ def test_find_duplicates(hw):
     assert len(pairs) >= n
 
     # Prevent argparsing of pytest args
-    pairs, distances = find_duplicates(array=data, num_channels=1, show_train=False)
+    pairs, distances = find_duplicates(data, num_channels=1, show_train=False)
     assert len(pairs) >= n
