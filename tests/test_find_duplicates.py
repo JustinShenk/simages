@@ -13,7 +13,7 @@ from simages import find_duplicates, Embeddings
 def test_find_duplicates(hw):
     data = np.random.random((100, hw, hw))
     data = data[:, np.newaxis, ...]
-    embeddings = Embeddings(data, show_train=False)
+    embeddings = Embeddings(array=data, show_train=False)
 
     n = 3
     pairs, distances = embeddings.duplicates(n=n)
