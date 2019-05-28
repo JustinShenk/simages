@@ -21,10 +21,10 @@ pip install .
 
 ### Command Line
 
-Enter the directory and enter
+In your console, enter the directory with images and use `simages-show`:
 
 ```bash
-simages-show --data-dir .
+$ simages-show --data-dir .
 ```
 
 Options:
