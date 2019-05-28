@@ -1,6 +1,6 @@
 import os
 import glob
-from typing import Union
+from typing import Optional, Union
 
 import closely
 import matplotlib.pyplot as plt
@@ -11,9 +11,10 @@ import torchvision
 from .extractor import EmbeddingExtractor
 
 
-class Embeddings():
+class Embeddings:
     """Create embeddings from `input` data."""
-    def __init__(self, input:Union[np.ndarray, str], **kwargs):
+
+    def __init__(self, input: Union[np.ndarray, str], **kwargs):
         if isinstance(input, str):
             if os.path.isdir(input):
                 self.data_dir = input
@@ -21,7 +22,7 @@ class Embeddings():
                 files = glob.glob(os.path.join(input, "*.*"))
 
                 # Exclude hidden files
-                files = [x for x in files if not x.startswith('.')]
+                files = [x for x in files if not x.startswith(".")]
 
                 # Assume they are images
                 if len(files):
@@ -37,17 +38,16 @@ class Embeddings():
     def array(self):
         return self.extractor.embeddings
 
-    def duplicates(self, n:int=5):
-        assert isinstance(self.embeddings, np.ndarray)
+    def duplicates(self, n: Optional[int] = None):
         self.pairs, self.distances = closely.solve(self.embeddings, n=n)
 
         return self.pairs, self.distances
 
-    def images_to_embeddings(self, data_dir:str, **kwargs):
+    def images_to_embeddings(self, data_dir: str, **kwargs):
         self.extractor = EmbeddingExtractor(data_dir=data_dir, **kwargs)
         return self.extractor.embeddings
 
-    def array_to_embeddings(self, array:np.ndarray, **kwargs):
+    def array_to_embeddings(self, array: np.ndarray, **kwargs):
         self.extractor = EmbeddingExtractor(array=array, **kwargs)
         return self.extractor.embeddings
 
@@ -61,11 +61,13 @@ class Embeddings():
             raise NotImplementedError(f"{type(img)}")
 
         plt.subplots()
-        plt.title(title)
-        plt.imshow(np.transpose(npimg,(1,2,0)).squeeze(), interpolation='nearest')
+        plt.title(f"{title}")
+        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
         plt.show()
 
-    def show_images(self, indices, title=""):
+    def show_images(self, indices: Union[list, int], title=""):
+        if isinstance(indices, int):
+            indices = [indices]
         tensors = [self.extractor.dataloader.dataset[idx].cpu() for idx in indices]
         self.show(torchvision.utils.make_grid(tensors), title=title)
 
@@ -73,12 +75,16 @@ class Embeddings():
         if not hasattr(self, "pairs"):
             self.pairs, self.distances = self.duplicates(n=n)
         elif len(self.pairs) < n:
-            print(f"Requested duplicates {n} is greater than {len(self.pairs)}, recalculating...")
+            print(
+                f"Requested duplicates {n} is greater than {len(self.pairs)}, recalculating..."
+            )
             self.pairs, self.distances = self.duplicates(n=n)
 
         # Plot pairs
-        imgs = []
-        for pair in self.pairs:
+        for idx, pair in enumerate(self.pairs):
             img0 = self.extractor.dataloader.dataset[pair[0]].cpu()
             img1 = self.extractor.dataloader.dataset[pair[1]].cpu()
-            self.show(torchvision.utils.make_grid([img0, img1]), title=pair)
+            self.show(
+                torchvision.utils.make_grid([img0, img1]),
+                title=f"{pair}, dist={self.distances[idx]:.2f}",
+            )

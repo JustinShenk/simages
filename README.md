@@ -21,7 +21,7 @@ pip install .
 import simages
 
 # X is an n x m numpy array
-pairs, distances = simages.
+pairs, distances = simages.show_duplicates
 ```
 
 You can specify how many pairs you want to identify with `n`.

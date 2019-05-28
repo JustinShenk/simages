@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class Autoencoder(nn.Module):
     def __init__(self, num_channels=1, z_dim=32):
         super(Autoencoder, self).__init__()
@@ -45,8 +46,9 @@ class Autoencoder(nn.Module):
         x = torch.sigmoid(x)
         return x, embedding
 
+
 class BasicAutoencoder(nn.Module):
-    def __init__(self, num_channels=1, z_dim=16):
+    def __init__(self, num_channels=1, z_dim=8):
         super(BasicAutoencoder, self).__init__()
 
         self.z_dim = z_dim

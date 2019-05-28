@@ -12,6 +12,7 @@ from torch.utils.data.dataset import Dataset
 
 from .models import BasicAutoencoder, Autoencoder
 
+
 class PILDataset(Dataset):
     """PIL dataset."""
 
@@ -36,8 +37,17 @@ class PILDataset(Dataset):
 
         return sample
 
+
 class EmbeddingExtractor:
-    def __init__(self, data_dir=None, array=None, num_channels=1, num_epochs=2, batch_size=32, show_train=True):
+    def __init__(
+        self,
+        data_dir=None,
+        array=None,
+        num_channels=1,
+        num_epochs=2,
+        batch_size=32,
+        show_train=True,
+    ):
         self.num_epochs = num_epochs
         self.batch_size = batch_size
         self.show_train = show_train
@@ -45,23 +55,36 @@ class EmbeddingExtractor:
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.num_channels = num_channels
 
-        data_transforms = transforms.Compose([transforms.Resize(50),
-                                              transforms.CenterCrop(48),
-                                              transforms.ToTensor(),
-                                              transforms.Normalize([0.5] * num_channels, [0.25] * num_channels)])
+        data_transforms = transforms.Compose(
+            [transforms.Resize(50), transforms.CenterCrop(48), transforms.ToTensor()]
+        )
 
-        img_extensions = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif', '.gif', '.octet-stream']
+        img_extensions = [
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".ppm",
+            ".bmp",
+            ".pgm",
+            ".tif",
+            ".gif",
+            ".octet-stream",
+        ]
         if isinstance(data_dir, str):
-            self.image_datasets = datasets.DatasetFolder(data_dir, self.pil_loader, img_extensions,
-                                                         data_transforms)
-            self.dataloader = torch.utils.data.DataLoader(self.image_datasets, batch_size=batch_size, shuffle=False,
-                                                          num_workers=4)
+            self.image_datasets = datasets.DatasetFolder(
+                data_dir, self.pil_loader, img_extensions, data_transforms
+            )
+            self.dataloader = torch.utils.data.DataLoader(
+                self.image_datasets, batch_size=batch_size, shuffle=False, num_workers=4
+            )
         elif array is not None:
             assert isinstance(array, np.ndarray)
             self.dataloader = self.tensor_dataloader(array, data_transforms)
 
         if not torch.cuda.is_available():
-            print("Note: No GPU found, using CPU. Performance is improved on a CUDA-device.")
+            print(
+                "Note: No GPU found, using CPU. Performance is improved on a CUDA-device."
+            )
             self.model = BasicAutoencoder()
         else:
             self.model = Autoencoder()
@@ -75,45 +98,49 @@ class EmbeddingExtractor:
         self.optimizer = torch.optim.Adam(self.model.parameters(), weight_decay=1e-5)
 
         self.train()
+        self.eval()
 
     def tensor_dataloader(self, array, transforms):
         print(f"INFO: data shape: {array.shape} (Target: N x C x H x W)")
         if array.ndim == 3:
-            print(f"Converting to grayscale dataset of dims {array.shape[0]} x 1 x {array.shape[1]} x {array.shape[2]}")
+            print(
+                f"Converting to grayscale dataset of dims {array.shape[0]} x 1 x {array.shape[1]} x {array.shape[2]}"
+            )
             array = array[:, np.newaxis, ...]
             print(f"New shape: {array.shape}")
 
         tensor = torch.Tensor(array)
         pil_list = [TF.to_pil_image(array.squeeze()) for array in tensor]
         dataset = PILDataset(pil_list, transform=transforms)
-        dataloader = utils.DataLoader(dataset, batch_size=self.batch_size, shuffle=False)  # create your dataloader
+        dataloader = utils.DataLoader(
+            dataset, batch_size=self.batch_size, shuffle=False
+        )  # create your dataloader
         return dataloader
 
     def show(self, img, epoch):
         npimg = img.numpy()
         plt.subplots()
         plt.title(f"Epoch: {epoch}")
-        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation='nearest')
+        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
         plt.show()
 
     def pil_loader(self, path):
         print("loading {}".format(path))
         channels = "RGB" if self.num_channels >= 3 else "L"
         try:
-            with open(path, 'rb') as f:
+            with open(path, "rb") as f:
                 img = Image.open(f)
                 return img.convert(channels)
         except:
-            print('fail to load {} using PIL'.format(img))
+            print("fail to load {} using PIL".format(img))
 
     def train(self):
         for epoch in range(self.num_epochs):
-            embeddings = []
             for data in self.dataloader:
                 img = data.to(self.device)
                 # ===================forward=====================
                 output, embedding = self.model(img)
-                embeddings.append(embedding.cpu())
+
                 loss = self.distance(output, img)
                 # ===================backward====================
                 self.optimizer.zero_grad()
@@ -131,18 +158,50 @@ class EmbeddingExtractor:
                     print(f"{e}")
 
             # ===================log========================
-            print('epoch [{}/{}], loss:{:.4f}'.format(epoch + 1, self.num_epochs, loss))
+            print("epoch [{}/{}], loss:{:.4f}".format(epoch + 1, self.num_epochs, loss))
+
+    def eval(self):
+        embeddings = []
+        imgs = []
+        self.model.eval()
+        for data in self.dataloader:
+            img = data.to(self.device)
+            imgs.append(img)
+            # ===================forward=====================
+            output, embedding = self.model(img)
+            embeddings.append(embedding)
+
+            loss = self.distance(output, img)
+            # ===================backward====================
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
+
+        if self.show_train:
+            try:
+                img_array = img.cpu()[0]
+                output_array = output.detach().cpu()[0]
+
+                grid_img = torchvision.utils.make_grid([img_array, output_array])
+                self.show(grid_img, title=f"Epoch {epoch}")
+            except Exception as e:
+                print(f"{e}")
+
+        # ===================log========================
+        print("eval, loss:{:.4f}".format(loss))
 
         self.embeddings = torch.cat(embeddings).detach().cpu().numpy()
+        self.evalimgs = imgs
 
     def show(self, img, title=""):
         if isinstance(img, torch.Tensor):
             npimg = img.numpy()
         else:
             raise NotImplementedError(f"{type(img)}")
+
         plt.subplots()
         plt.title(title)
-        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation='nearest')
+        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
         plt.show()
 
     def decode(self, embedding=None, index=None):
@@ -150,7 +209,14 @@ class EmbeddingExtractor:
             embedding = self.embeddings[index]
 
         emb = np.expand_dims(embedding, 0)  # add batch axis
-        output, _ = self.model.module.decode(torch.Tensor(emb).to(self.device))
+
+        self.model.eval()
+
+        # Check if has direct access to `decode` method
+        if not hasattr(self.model, "decode"):
+            output, _ = self.model.module.decode(torch.Tensor(emb).to(self.device))
+        else:
+            output, _ = self.model.decode(torch.Tensor(emb).to(self.device))
 
         grid_img = torchvision.utils.make_grid(output)
         self.show(grid_img, title=index)
