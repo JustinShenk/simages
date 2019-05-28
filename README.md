@@ -195,7 +195,3 @@ You can specify how many pairs you want to identify with `n`.
 ### How it works
 
 Simages uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely).
-
-
-Output:
-![example_plot](example_plot.png)
