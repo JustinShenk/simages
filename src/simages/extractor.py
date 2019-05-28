@@ -46,10 +46,10 @@ class EmbeddingExtractor:
         """Inits EmbeddingExtractor with input, either `str` or `np.nd.array`, performs training and validation.
 
         Args:
-            input (np.ndarray or str)
-            num_channels (int)
-            num_epochs (int)
-            batch_size (int)
+            input (np.ndarray or str): data
+            num_channels (int): grayscale = 1, color = 3
+            num_epochs (int): more is better (generally)
+            batch_size (int): number of images per batch
             show_train (bool): show intermediate training results
             show (bool): show closest pairs
             z_dim (int): compression size
@@ -88,7 +88,7 @@ class EmbeddingExtractor:
             try:
                 Image.open(path).verify()
             except Exception as e:
-                logging.info(f"Skipping {os.path.basename(path)}: {e}")
+                log.info(f"Skipping {os.path.basename(path)}: {e}")
                 return False
             return True
 
@@ -118,14 +118,14 @@ class EmbeddingExtractor:
             )
 
         if not torch.cuda.is_available():
-            logging.warning(
+            log.info(
                 "Note: No GPU found, using CPU. Performance is improved on a CUDA-device."
             )
 
         self.model = BasicAutoencoder(num_channels=num_channels, z_dim=z_dim)
 
         if torch.cuda.device_count() > 1:
-            logging.info("Let's use", torch.cuda.device_count(), "GPUs!")
+            log.info("Let's use", torch.cuda.device_count(), "GPUs!")
             model = nn.DataParallel(self.model)
 
         self.model.to(self._device)
@@ -143,13 +143,13 @@ class EmbeddingExtractor:
             return result.cpu()
 
     def tensor_dataloader(self, array, transforms, shuffle=True):
-        logging.debug(f"INFO: data shape: {array.shape} (Target: N x C x H x W)")
+        log.debug(f"INFO: data shape: {array.shape} (Target: N x C x H x W)")
         if array.ndim == 3:
-            logging.debug(
+            log.debug(
                 f"Converting to grayscale dataset of dims {array.shape[0]} x 1 x {array.shape[1]} x {array.shape[2]}"
             )
             array = array[:, np.newaxis, ...]
-            logging.debug(f"New shape: {array.shape}")
+            log.debug(f"New shape: {array.shape}")
 
         tensor = torch.Tensor(array)
         pil_list = [TF.to_pil_image(array.squeeze()) for array in tensor]
@@ -160,14 +160,14 @@ class EmbeddingExtractor:
         return dataloader
 
     def pil_loader(self, path):
-        logging.info("loading {}".format(path))
+        log.info("loading {}".format(path))
         channels = "RGB" if self._num_channels >= 3 else "L"
         try:
             with open(path, "rb") as f:
                 img = Image.open(f)
                 return img.convert(channels)
         except:
-            logging.error("fail to load {} using PIL".format(img))
+            log.error("fail to load {} using PIL".format(img))
 
     def train(self):
         for epoch in range(self.num_epochs):
@@ -192,10 +192,10 @@ class EmbeddingExtractor:
                     grid_img = torchvision.utils.make_grid([img_array, output_array])
                     self.show(grid_img, title=f"Epoch {epoch}", block=False)
                 except Exception as e:
-                    logging.error(f"{e}")
+                    log.error(f"{e}")
 
             # ===================log========================
-            logging.info("epoch [{}/{}], loss:{:.4f}".format(epoch + 1, self.num_epochs, loss))
+            log.info("epoch [{}/{}], loss:{:.4f}".format(epoch + 1, self.num_epochs, loss))
 
     def eval(self):
         embeddings = []
@@ -225,10 +225,10 @@ class EmbeddingExtractor:
                 grid_img = torchvision.utils.make_grid([img_array, output_array])
                 self.show(grid_img, title=f"Reconstruction")
             except Exception as e:
-                logging.error(f"{e}")
+                log.error(f"{e}")
 
         # ===================log========================
-        logging.info("eval, loss:{:.4f}".format(loss))
+        log.info("eval, loss:{:.4f}".format(loss))
 
         self.embeddings = torch.cat(embeddings).detach().cpu().numpy()
 

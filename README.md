@@ -15,6 +15,10 @@ cd simages
 pip install .
 ```
 
+### Demo
+
+![simages_demo](images/simages_demo.gif)
+
 ### Command Line
 
 Enter the directory and enter
@@ -141,11 +145,48 @@ N = 1000
 data = np.random.random((N, 28, 28))
 extractor = EmbeddingExtractor(data, num_channels=1)
 
-# Access the array
-array = embeddings.array # N x z (compression size)
+# Show 10 closest pairs of images
+pairs, distances = extractor.show_duplicates(n=10)
 
-# Get 10 closest pairs of images
-pairs, distances = embeddings.duplicates(n=5)
+```
+
+Class attributes and parameters:
+
+```python
+class EmbeddingExtractor:
+    """Extract embeddings from data with models and allow visualization.
+
+    Attributes:
+        trainloader (torch loader)
+        evalloader (torch loader
+        model (torch.nn.Module)
+        embeddings (np.ndarray)
+
+    """
+    def __init__(
+        self,
+        input:Union[str,np.ndarray],
+        num_channels=None,
+        num_epochs=2,
+        batch_size=32,
+        show_train=True,
+        show=False,
+        z_dim=8,
+        **kwargs,
+    ):
+    """Inits EmbeddingExtractor with input, either `str` or `np.nd.array`, performs training and validation.
+    
+    Args:
+    input (np.ndarray or str): data
+    num_channels (int): grayscale = 1, color = 3
+    num_epochs (int): more is better (generally)
+    batch_size (int): number of images per batch
+    show_train (bool): show intermediate training results
+    show (bool): show closest pairs
+    z_dim (int): compression size
+    kwargs (dict)
+    
+    """
 
 ```
 
@@ -155,10 +196,6 @@ You can specify how many pairs you want to identify with `n`.
 
 Simages uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely).
 
-### Example
-```python
- 
-```
 
 Output:
 ![example_plot](example_plot.png)
