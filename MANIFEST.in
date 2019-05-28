@@ -1,0 +1,8 @@
+include *.rst *.txt tox.ini .coveragerc LICENSE .pre-commit-config.yaml pyproject.toml
+exclude .gitmodules appveyor.yml .readthedocs.yml .travis.yml codecov.yml
+graft tests
+graft .github
+recursive-exclude tests *.pyc
+graft extras
+graft docs
+prune docs/_build
