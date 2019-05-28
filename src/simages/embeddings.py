@@ -9,9 +9,20 @@ from .extractor import EmbeddingExtractor
 
 
 class Embeddings:
-    """Create embeddings from `input` data."""
+    """Create embeddings from `input` data by training an autoencoder.
+
+    Passes arguments for `EmbeddingExtractor`.
+
+    Attributes:
+        extractor (simages.EmbeddingExtractor): workhorse for extracting embeddings from dataset
+        embeddings (np.ndarray): embeddings
+        pairs (list): n closest pairs
+        distances (np.ndarray): distances between n-closest pairs
+
+    """
 
     def __init__(self, input: Union[np.ndarray, str], **kwargs):
+        """Inits Embeddings with data."""
         if isinstance(input, str):
             if os.path.isdir(input):
                 self.data_dir = input
@@ -27,12 +38,16 @@ class Embeddings:
                 else:
                     raise Exception(f"Files count is {len(files)}")
         elif isinstance(input, np.ndarray):
-            if input.ndim == 3:
+            if input.ndim == 3 and input.shape[0] == 1:
                 num_channels = 1
             elif input.ndim == 4:
                 num_channels = input.shape[1]
+            else:
+                raise(f"Data shape {input.shape} not supported, shoudld be N x C x H x W")
 
-            self.embeddings = self.array_to_embeddings(input, num_channels = num_channels, **kwargs)
+            self.embeddings = self.array_to_embeddings(
+                input, num_channels=num_channels, **kwargs
+            )
         else:
             raise NotImplementedError(f"{type(input)}")
 
@@ -40,7 +55,7 @@ class Embeddings:
     def array(self):
         return self.extractor.embeddings
 
-    def duplicates(self, n: Optional[int] = None):
+    def duplicates(self, n: int = 10):
         self.pairs, self.distances = closely.solve(self.embeddings, n=n)
 
         return self.pairs, self.distances
@@ -50,7 +65,6 @@ class Embeddings:
         return self.extractor.embeddings
 
     def array_to_embeddings(self, array: np.ndarray, **kwargs):
-        print("kwargs", kwargs)
         self.extractor = EmbeddingExtractor(array=array, **kwargs)
         return self.extractor.embeddings
 

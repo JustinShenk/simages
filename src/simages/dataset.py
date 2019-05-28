@@ -55,19 +55,29 @@ class SingleFolderDataset(VisionDataset):
         samples (list): List of (sample path, class_index) tuples
     """
 
-    def __init__(self, root, loader=default_loader, extensions=None, transform=None, is_valid_file=None):
+    def __init__(
+        self,
+        root,
+        loader=default_loader,
+        extensions=None,
+        transform=None,
+        is_valid_file=None,
+    ):
         super(SingleFolderDataset, self).__init__(root)
         self.transform = transform
         samples = make_dataset_wo_targets(self.root, extensions, is_valid_file)
         if len(samples) == 0:
-            raise (RuntimeError("Found 0 files in subfolders of: " + self.root + "\n"
-                                "Supported extensions are: " + ",".join(extensions)))
+            raise (
+                RuntimeError(
+                    "Found 0 files in subfolders of: " + self.root + "\n"
+                    "Supported extensions are: " + ",".join(extensions)
+                )
+            )
 
         self.loader = loader
         self.extensions = extensions
 
         self.samples = samples
-
 
     def __getitem__(self, index):
         """
@@ -84,24 +94,27 @@ class SingleFolderDataset(VisionDataset):
 
         return sample
 
-
     def __len__(self):
         return len(self.samples)
+
 
 def make_dataset_wo_targets(dir, extensions=None, is_valid_file=None):
     """Modified from torchvision `make_dataset`."""
     images = []
     dir = os.path.expanduser(dir)
     if not ((extensions is None) ^ (is_valid_file is None)):
-        raise ValueError("Both extensions and is_valid_file cannot be None or not None at the same time")
+        raise ValueError(
+            "Both extensions and is_valid_file cannot be None or not None at the same time"
+        )
     if extensions is not None:
+
         def is_valid_file(x):
             return has_file_allowed_extension(x, extensions)
 
     for fname in sorted(os.listdir(dir)):
         path = os.path.join(dir, fname)
         if is_valid_file(path):
-            item = (path)
+            item = path
             images.append(item)
 
     return images

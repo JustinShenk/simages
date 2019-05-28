@@ -5,6 +5,7 @@ channels:
 dependencies:
   - scikit-learn
   - numpy
-  - torch
-  - torchvision
+  - pytorch
+  - pip:
+    - torchvision>=0.3.0
 
