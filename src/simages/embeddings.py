@@ -61,11 +61,11 @@ class Embeddings:
         return self.pairs, self.distances
 
     def images_to_embeddings(self, data_dir: str, **kwargs):
-        self.extractor = EmbeddingExtractor(data_dir=data_dir, **kwargs)
+        self.extractor = EmbeddingExtractor(data_dir, **kwargs)
         return self.extractor.embeddings
 
     def array_to_embeddings(self, array: np.ndarray, **kwargs):
-        self.extractor = EmbeddingExtractor(array=array, **kwargs)
+        self.extractor = EmbeddingExtractor(array, **kwargs)
         return self.extractor.embeddings
 
     def __repr__(self):
