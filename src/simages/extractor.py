@@ -1,3 +1,7 @@
+import os
+from typing import Union
+
+import closely
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -8,45 +12,21 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 import torch.utils.data as utils
-from torch.utils.data.dataset import Dataset
 
+from .dataset import PILDataset
 from .models import BasicAutoencoder, Autoencoder
-
-
-class PILDataset(Dataset):
-    """PIL dataset."""
-
-    def __init__(self, pil_list, transform=None):
-        """
-        Args:
-            pil_list (list of PIL images)
-            transform (callable, optional): Optional transform to be applied
-                on a sample.
-        """
-        self.pil_list = pil_list
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.pil_list)
-
-    def __getitem__(self, idx):
-        sample = self.pil_list[idx]
-
-        if self.transform:
-            sample = self.transform(sample)
-
-        return sample
 
 
 class EmbeddingExtractor:
     def __init__(
-        self,
-        data_dir=None,
-        array=None,
-        num_channels=1,
-        num_epochs=2,
-        batch_size=32,
-        show_train=True,
+            self,
+            data_dir=None,
+            array=None,
+            num_channels=3,
+            num_epochs=2,
+            batch_size=32,
+            show_train=True,
+            **kwargs
     ):
         self.num_epochs = num_epochs
         self.batch_size = batch_size
@@ -70,12 +50,26 @@ class EmbeddingExtractor:
             ".gif",
             ".octet-stream",
         ]
+
+        def is_valid(path):
+            _, file_extension = os.path.splitext(path)
+            valid_ext = file_extension.lower() in img_extensions
+            if not valid_ext:
+                return False
+            try:
+                Image.open(path).verify()
+            except Exception as e:
+                print(f"Skipping {path}: {e}")
+                return False
+            return True
+
         if isinstance(data_dir, str):
-            self.image_datasets = datasets.DatasetFolder(
-                data_dir, self.pil_loader, img_extensions, data_transforms
+            self.image_dataset = datasets.ImageFolder(
+                root=data_dir, transform=data_transforms,
+                is_valid_file=is_valid
             )
             self.dataloader = torch.utils.data.DataLoader(
-                self.image_datasets, batch_size=batch_size, shuffle=False, num_workers=4
+                self.image_dataset, batch_size=batch_size, shuffle=False, num_workers=4
             )
         elif array is not None:
             assert isinstance(array, np.ndarray)
@@ -85,9 +79,9 @@ class EmbeddingExtractor:
             print(
                 "Note: No GPU found, using CPU. Performance is improved on a CUDA-device."
             )
-            self.model = BasicAutoencoder()
+            self.model = BasicAutoencoder(num_channels=num_channels)
         else:
-            self.model = Autoencoder()
+            self.model = Autoencoder(num_channels=num_channels)
 
         if torch.cuda.device_count() > 1:
             print("Let's use", torch.cuda.device_count(), "GPUs!")
@@ -137,6 +131,8 @@ class EmbeddingExtractor:
     def train(self):
         for epoch in range(self.num_epochs):
             for data in self.dataloader:
+                if isinstance(data, tuple):
+                    data = data[0]
                 img = data.to(self.device)
                 # ===================forward=====================
                 output, embedding = self.model(img)
@@ -165,6 +161,8 @@ class EmbeddingExtractor:
         imgs = []
         self.model.eval()
         for data in self.dataloader:
+            if isinstance(data, tuple):
+                data = data[0]
             img = data.to(self.device)
             imgs.append(img)
             # ===================forward=====================
@@ -203,6 +201,39 @@ class EmbeddingExtractor:
         plt.title(title)
         plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
         plt.show()
+
+    def duplicates(self, n:int=10):
+        pairs, distances = closely.solve(self.embeddings,n=n)
+        return pairs, distances
+
+    def show(self, img, title=""):
+        if isinstance(img, torch.Tensor):
+            npimg = img.numpy()
+        else:
+            raise NotImplementedError(f"{type(img)}")
+
+        plt.subplots()
+        plt.title(f"{title}")
+        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
+        plt.show(block=False)
+
+    def show_images(self, indices: Union[list, int], title=""):
+        if isinstance(indices, int):
+            indices = [indices]
+        tensors = [self.extractor.dataloader.dataset[idx].cpu() for idx in indices]
+        self.show(torchvision.utils.make_grid(tensors), title=title)
+
+    def show_duplicates(self, n=5):
+        pairs, distances = self.duplicates(n=n)
+
+        # Plot pairs
+        for idx, pair in enumerate(pairs):
+            img0 = self.dataloader.dataset[pair[0]].cpu()
+            img1 = self.dataloader.dataset[pair[1]].cpu()
+            self.show(
+                torchvision.utils.make_grid([img0, img1]),
+                title=f"{pair}, dist={distances[idx]:.2f}",
+            )
 
     def decode(self, embedding=None, index=None):
         if embedding is None:

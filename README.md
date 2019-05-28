@@ -18,10 +18,14 @@ pip install .
 ### How to use
 
 ```python
-import simages
+
+```
+```python
+from simages import Embeddings
 
 # X is an n x m numpy array
-pairs, distances = simages.show_duplicates
+images = Embeddings(data)
+pairs, distances = embedding.show_duplicates(n=10)
 ```
 
 You can specify how many pairs you want to identify with `n`.

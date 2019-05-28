@@ -13,6 +13,12 @@ NAME = "simages"
 PACKAGES = find_packages(where="src")
 HERE = os.path.abspath(os.path.dirname(__file__))
 
+ENTRY_POINTS = {
+    "console_scripts" : [
+        'simages-show = simages.main:find_duplicates'
+    ],
+}
+
 
 def read(*parts):
     """
@@ -67,6 +73,7 @@ EXTRAS_REQUIRE["dev"] = (
 
 VERSION = find_meta("version")
 
+
 # README.rst
 if os.path.exists(os.path.join(HERE, "README.rst")):
     LONG = (
@@ -107,5 +114,6 @@ setup(
     python_requires=PYTHON_REQUIRES,
     include_package_data=True,
     package_dir={"": "src"},
+    entry_points=ENTRY_POINTS,
     zip_safe=False,
 )

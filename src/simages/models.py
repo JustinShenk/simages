@@ -7,6 +7,7 @@ class Autoencoder(nn.Module):
     def __init__(self, num_channels=1, z_dim=32):
         super(Autoencoder, self).__init__()
 
+        self.input_channels = num_channels
         self.z_dim = z_dim
         self.conv1 = nn.Conv2d(num_channels, 32, kernel_size=3)  # 46x46
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3)  # 44x44
@@ -51,6 +52,7 @@ class BasicAutoencoder(nn.Module):
     def __init__(self, num_channels=1, z_dim=8):
         super(BasicAutoencoder, self).__init__()
 
+        self.input_channels = num_channels
         self.z_dim = z_dim
         self.conv1 = nn.Conv2d(num_channels, 32, kernel_size=3)  # 46x46
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3)  # 44x44
