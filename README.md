@@ -107,7 +107,7 @@ def find_duplicates(
         distances (np.ndarray): distances of each pair to each other
 ```
 
-### `Embeddings` API
+#### `Embeddings` API
 
 ```python
 from simages import Embeddings
