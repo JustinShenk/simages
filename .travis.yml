@@ -14,7 +14,7 @@ install:
 - hash -r
 - conda config --set always_yes yes --set changeps1 no
 - conda update -q conda
-- conda env create -n test-environment -f environment.yml python=$TRAVIS_PYTHON_VERSION
+- conda env create -n test-environment -f environment_cpu.yml python=$TRAVIS_PYTHON_VERSION
 - source activate test-environment
 - pip install -r requirements.txt
 - pip install pytest
