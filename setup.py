@@ -15,7 +15,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 ENTRY_POINTS = {
     "console_scripts" : [
-        'simages-show = simages.main:find_duplicates'
+        'simages-show = simages.main:main'
     ],
 }
 

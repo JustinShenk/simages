@@ -1,5 +1,6 @@
 import os
 from typing import Union
+import warnings
 
 import closely
 import matplotlib.pyplot as plt
@@ -13,9 +14,11 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 import torch.utils.data as utils
 
-from .dataset import PILDataset
+from .dataset import PILDataset, SingleFolderDataset
 from .models import BasicAutoencoder, Autoencoder
 
+
+warnings.filterwarnings("ignore", message="Palette images with Transparency")
 
 class EmbeddingExtractor:
     def __init__(
@@ -26,6 +29,7 @@ class EmbeddingExtractor:
             num_epochs=2,
             batch_size=32,
             show_train=True,
+            z_dim = 8,
             **kwargs
     ):
         self.num_epochs = num_epochs
@@ -51,6 +55,7 @@ class EmbeddingExtractor:
             ".octet-stream",
         ]
 
+
         def is_valid(path):
             _, file_extension = os.path.splitext(path)
             valid_ext = file_extension.lower() in img_extensions
@@ -59,29 +64,38 @@ class EmbeddingExtractor:
             try:
                 Image.open(path).verify()
             except Exception as e:
-                print(f"Skipping {path}: {e}")
+                print(f"Skipping {os.path.basename(path)}: {e}")
                 return False
             return True
 
         if isinstance(data_dir, str):
-            self.image_dataset = datasets.ImageFolder(
-                root=data_dir, transform=data_transforms,
-                is_valid_file=is_valid
+            data_dir = os.path.abspath(data_dir)
+            hasdir = any([os.path.isdir(path) for path in os.listdir(data_dir)])
+            if not hasdir:
+                self.image_dataset = SingleFolderDataset(data_dir, transform=data_transforms, is_valid_file=is_valid)
+            else:
+                self.image_dataset = datasets.ImageFolder(
+                    root=data_dir, transform=data_transforms,
+                    is_valid_file=is_valid
+                )
+            self.trainloader = torch.utils.data.DataLoader(
+                self.image_dataset, batch_size=batch_size, shuffle=True, num_workers=4
             )
-            self.dataloader = torch.utils.data.DataLoader(
+            self.evalloader = torch.utils.data.DataLoader(
                 self.image_dataset, batch_size=batch_size, shuffle=False, num_workers=4
             )
         elif array is not None:
             assert isinstance(array, np.ndarray)
-            self.dataloader = self.tensor_dataloader(array, data_transforms)
+            self.trainloader = self.tensor_dataloader(array, data_transforms, shuffle=True)
+            self.evalloader = self.tensor_dataloader(array, data_transforms, shuffle=False)
 
         if not torch.cuda.is_available():
             print(
                 "Note: No GPU found, using CPU. Performance is improved on a CUDA-device."
             )
-            self.model = BasicAutoencoder(num_channels=num_channels)
+            self.model = BasicAutoencoder(num_channels=num_channels, z_dim=z_dim)
         else:
-            self.model = Autoencoder(num_channels=num_channels)
+            self.model = Autoencoder(num_channels=num_channels, z_dim=z_dim)
 
         if torch.cuda.device_count() > 1:
             print("Let's use", torch.cuda.device_count(), "GPUs!")
@@ -94,7 +108,15 @@ class EmbeddingExtractor:
         self.train()
         self.eval()
 
-    def tensor_dataloader(self, array, transforms):
+    def get_image(self, index: int):
+        result = self.evalloader.dataset[index]
+        if isinstance(result, tuple):
+            return result[0].cpu()
+        else:
+            return result.cpu()
+
+
+    def tensor_dataloader(self, array, transforms, shuffle=True):
         print(f"INFO: data shape: {array.shape} (Target: N x C x H x W)")
         if array.ndim == 3:
             print(
@@ -107,16 +129,9 @@ class EmbeddingExtractor:
         pil_list = [TF.to_pil_image(array.squeeze()) for array in tensor]
         dataset = PILDataset(pil_list, transform=transforms)
         dataloader = utils.DataLoader(
-            dataset, batch_size=self.batch_size, shuffle=False
+            dataset, batch_size=self.batch_size, shuffle=shuffle
         )  # create your dataloader
         return dataloader
-
-    def show(self, img, epoch):
-        npimg = img.numpy()
-        plt.subplots()
-        plt.title(f"Epoch: {epoch}")
-        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
-        plt.show()
 
     def pil_loader(self, path):
         print("loading {}".format(path))
@@ -130,8 +145,8 @@ class EmbeddingExtractor:
 
     def train(self):
         for epoch in range(self.num_epochs):
-            for data in self.dataloader:
-                if isinstance(data, tuple):
+            for data in self.trainloader:
+                if isinstance(data, list):
                     data = data[0]
                 img = data.to(self.device)
                 # ===================forward=====================
@@ -160,8 +175,9 @@ class EmbeddingExtractor:
         embeddings = []
         imgs = []
         self.model.eval()
-        for data in self.dataloader:
-            if isinstance(data, tuple):
+
+        for data in self.evalloader:
+            if isinstance(data, list):
                 data = data[0]
             img = data.to(self.device)
             imgs.append(img)
@@ -191,16 +207,6 @@ class EmbeddingExtractor:
         self.embeddings = torch.cat(embeddings).detach().cpu().numpy()
         self.evalimgs = imgs
 
-    def show(self, img, title=""):
-        if isinstance(img, torch.Tensor):
-            npimg = img.numpy()
-        else:
-            raise NotImplementedError(f"{type(img)}")
-
-        plt.subplots()
-        plt.title(title)
-        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
-        plt.show()
 
     def duplicates(self, n:int=10):
         pairs, distances = closely.solve(self.embeddings,n=n)
@@ -208,19 +214,21 @@ class EmbeddingExtractor:
 
     def show(self, img, title=""):
         if isinstance(img, torch.Tensor):
-            npimg = img.numpy()
+            npimg = img.detach().numpy()
+        elif isinstance(img, np.ndarray):
+            pass
         else:
             raise NotImplementedError(f"{type(img)}")
 
         plt.subplots()
         plt.title(f"{title}")
         plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
-        plt.show(block=False)
+        plt.show()
 
     def show_images(self, indices: Union[list, int], title=""):
         if isinstance(indices, int):
             indices = [indices]
-        tensors = [self.extractor.dataloader.dataset[idx].cpu() for idx in indices]
+        tensors = [self.get_image(idx) for idx in indices]
         self.show(torchvision.utils.make_grid(tensors), title=title)
 
     def show_duplicates(self, n=5):
@@ -228,20 +236,24 @@ class EmbeddingExtractor:
 
         # Plot pairs
         for idx, pair in enumerate(pairs):
-            img0 = self.dataloader.dataset[pair[0]].cpu()
-            img1 = self.dataloader.dataset[pair[1]].cpu()
+            img0 = self.get_image(pair[0])
+            img1 = self.get_image(pair[1])
+            img0_reconst = self.decode(index=pair[0])[0]
+            img1_reconst = self.decode(index=pair[1])[0]
             self.show(
-                torchvision.utils.make_grid([img0, img1]),
+                torchvision.utils.make_grid([img0, img1, img0_reconst, img1_reconst], nrow=2),
                 title=f"{pair}, dist={distances[idx]:.2f}",
             )
 
-    def decode(self, embedding=None, index=None):
+        return pairs, distances
+
+    def decode(self, embedding=None, index=None, show=False):
+        self.model.eval()
+
         if embedding is None:
             embedding = self.embeddings[index]
 
         emb = np.expand_dims(embedding, 0)  # add batch axis
-
-        self.model.eval()
 
         # Check if has direct access to `decode` method
         if not hasattr(self.model, "decode"):
@@ -249,5 +261,9 @@ class EmbeddingExtractor:
         else:
             output, _ = self.model.decode(torch.Tensor(emb).to(self.device))
 
-        grid_img = torchvision.utils.make_grid(output)
-        self.show(grid_img, title=index)
+        if show:
+            grid_img = torchvision.utils.make_grid(output)
+            self.show(grid_img, title=index)
+
+        return output
+

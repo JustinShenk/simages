@@ -49,19 +49,21 @@ class Autoencoder(nn.Module):
 
 
 class BasicAutoencoder(nn.Module):
-    def __init__(self, num_channels=1, z_dim=8):
+    def __init__(self, num_channels=1, z_dim=8, hw=48):
         super(BasicAutoencoder, self).__init__()
 
         self.input_channels = num_channels
         self.z_dim = z_dim
+        self.hw = hw
         self.conv1 = nn.Conv2d(num_channels, 32, kernel_size=3)  # 46x46
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3)  # 44x44
         self.maxpool1 = nn.MaxPool2d(2)  # 22x22
         self.fc1 = nn.Linear(64 * 22 * 22, z_dim)
 
         # decoder
-        self.fc2 = nn.Linear(z_dim, 64 * 22 * 22)
-        self.convT1 = nn.ConvTranspose2d(16, num_channels, kernel_size=5)
+        self.fc2 = nn.Linear(z_dim, 256)
+        self.fc3 = nn.Linear(256, num_channels * hw * hw)
+        # self.convT1 = nn.ConvTranspose2d(16, num_channels, kernel_size=5)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -76,7 +78,8 @@ class BasicAutoencoder(nn.Module):
     def decode(self, x):
         embedding = x
         x = self.fc2(x)
-        x = x.view(x.size(0), 16, 44, 44)
-        x = self.convT1(x)
+        x = F.relu(x)
+        x = self.fc3(x)
+        x = x.view(x.size(0), self.input_channels, self.hw, self.hw)
         x = torch.sigmoid(x)
         return x, embedding

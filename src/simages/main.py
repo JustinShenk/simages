@@ -12,6 +12,7 @@ from simages import Embeddings, EmbeddingExtractor
 def parse_arguments(args):
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "-d",
         "--data_dir",
         type=str,
         default=None,
@@ -35,7 +36,7 @@ def parse_arguments(args):
         "--epochs",
         type=int,
         default=2,
-        help="Number of passes of dataset through model for training. More is better but takes much time."
+        help="Number of passes of dataset through model for training. More is better but takes more time."
     )
     parser.add_argument(
         "-c",
@@ -47,10 +48,18 @@ def parse_arguments(args):
     parser.add_argument(
         "--pairs",
         type=int,
-        default=None,
+        default=10,
         help="Number of pairs of images to show"
     )
     parser.add_argument(
+        "-z",
+        "--zdim",
+        type=int,
+        default=8,
+        help="Compression bits (bigger generally performs better but takes more time)"
+    )
+    parser.add_argument(
+        "-s",
         "--show",
         action="store_true",
         default=False,
@@ -69,6 +78,7 @@ def find_duplicates(array:Optional[np.ndarray]=None, data_dir:Optional[str]=None
         num_epochs (int)
         show (bool)
         show_train (bool)
+        z_dim (int)
         kwargs (dict)
 
     Returns:
@@ -87,8 +97,10 @@ def find_duplicates(array:Optional[np.ndarray]=None, data_dir:Optional[str]=None
         pairs, distances = extractor.duplicates(n=n)
     return pairs, distances
 
-if __name__ == '__main__':
+def main():
     args = parse_arguments(sys.argv[1:])
 
     find_duplicates(data_dir=args.data_dir, n=args.pairs, num_epochs=args.epochs, num_channels=args.num_channels, show=args.show, show_train=args.show_train)
 
+if __name__ == '__main__':
+    main()
