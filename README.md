@@ -28,15 +28,16 @@ In your console, enter the directory with images and use `simages-show`:
 $ simages-show --data-dir .
 ```
 
-Options:
+Usage:
+
 ```
 usage: simages-show [-h] [--data-dir DATA_DIR] [--recursive] [--show-train]
                     [--epochs EPOCHS] [--num-channels NUM_CHANNELS]
                     [--pairs PAIRS] [--zdim ZDIM] [-s]
+```
 
-Find similar pairs of images in a folder
-
-optional arguments:
+Optional arguments:
+```
   -h, --help            show this help message and exit
   --data-dir DATA_DIR, -d DATA_DIR
                         Folder containing image data
