@@ -78,7 +78,7 @@ find_duplicates(data_dir=data_dir)
  
 ```
 
-Default options for find_duplicates are:
+Default options for `find_duplicates` are:
 
 ```
 def find_duplicates(
@@ -166,7 +166,7 @@ class EmbeddingExtractor:
     """
     def __init__(
         self,
-        input:Union[str,np.ndarray],
+        input:Union[str, np.ndarray],
         num_channels=None,
         num_epochs=2,
         batch_size=32,

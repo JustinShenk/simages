@@ -43,7 +43,9 @@ class Embeddings:
             elif input.ndim == 4:
                 num_channels = input.shape[1]
             else:
-                raise(f"Data shape {input.shape} not supported, shoudld be N x C x H x W")
+                raise (
+                    f"Data shape {input.shape} not supported, shoudld be N x C x H x W"
+                )
 
             self.embeddings = self.array_to_embeddings(
                 input, num_channels=num_channels, **kwargs

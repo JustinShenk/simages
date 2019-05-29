@@ -32,9 +32,10 @@ class EmbeddingExtractor:
         embeddings (np.ndarray)
 
     """
+
     def __init__(
         self,
-        input:Union[str,np.ndarray],
+        input: Union[str, np.ndarray],
         num_channels=None,
         num_epochs=2,
         batch_size=32,
@@ -195,7 +196,9 @@ class EmbeddingExtractor:
                     log.error(f"{e}")
 
             # ===================log========================
-            log.info("epoch [{}/{}], loss:{:.4f}".format(epoch + 1, self.num_epochs, loss))
+            log.info(
+                "epoch [{}/{}], loss:{:.4f}".format(epoch + 1, self.num_epochs, loss)
+            )
 
     def eval(self):
         embeddings = []
