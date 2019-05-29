@@ -65,7 +65,7 @@ Optional arguments:
 from simages import find_duplicates
 
 array_data # N x C x H x W
-find_duplicates(array=array_data)
+find_duplicates(array_data)
  
 ```
 
@@ -75,7 +75,7 @@ find_duplicates(array=array_data)
 from simages import find_duplicates
 
 data_dir = "my_images_folder"
-find_duplicates(data_dir=data_dir)
+find_duplicates(data_dir)
  
 ```
 
@@ -83,8 +83,7 @@ Default options for `find_duplicates` are:
 
 ```
 def find_duplicates(
-    array: Optional[np.ndarray] = None,
-    data_dir: Optional[str] = None,
+    input: Union[str or np.ndarray],
     n: int = 5,
     num_epochs: int = 2,
     num_channels: int = 3,
@@ -95,8 +94,7 @@ def find_duplicates(
     """Find duplicates in dataset. Either `array` or `data_dir` must be specified.
 
     Args:
-        array (np.ndarray, optional): N x C x H x W array
-        data_dir (str, optional): folder director
+        input (str or np.ndarray): folder directory or N x C x H x W array
         n (int): number of closest pairs to identify
         num_epochs (int): how long to train the autoencoder (more is generally better)
         show (bool): display the closest pairs
@@ -105,7 +103,7 @@ def find_duplicates(
         kwargs (dict): etc, passed to `EmbeddingExtractor`
 
     Returns:
-        pairs (list of lists): indices for closest pairs of images
+        pairs (np.ndarray): indices for closest pairs of images, n x 2 array
         distances (np.ndarray): distances of each pair to each other
 ```
 
@@ -130,7 +128,7 @@ pairs, distances = embeddings.duplicates(n=5)
 
 ```python
 In [0]: pairs
-Out[0]: [[912, 990], [716, 790], [907, 943], [483, 492], [806, 883]]
+Out[0]: array([[912, 990], [716, 790], [907, 943], [483, 492], [806, 883]])
 
 In [1]: distances
 Out[1]: array([0.00148035, 0.00150703, 0.00158789, 0.00168699, 0.00168721])

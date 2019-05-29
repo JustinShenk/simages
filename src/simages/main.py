@@ -4,7 +4,7 @@ import argparse
 import logging
 import os
 import sys
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 
@@ -72,51 +72,60 @@ def parse_arguments(args):
         default=8,
         help="Compression bits (bigger generally performs better but takes more time)",
     )
+    parser.add_argument(
+        "--image-path", "-i", action="store_true", help="Show image paths of duplicates"
+    )
     args, unknown = parser.parse_known_args(args)
     return args
 
 
 def find_duplicates(
-    array: Optional[np.ndarray] = None,
-    data_dir: Optional[str] = None,
+    input: Union[str, np.ndarray] = None,
     n: int = 5,
     num_epochs: int = 2,
     num_channels: int = 3,
     show: bool = False,
     show_train: bool = False,
+    show_path: bool = False,
+    z_dim: int = 8,
     **kwargs
 ):
     """Find duplicates in dataset. Either `array` or `data_dir` must be specified.
 
     Args:
-        array (np.ndarray, optional): N x C x H x W array
-        data_dir (str, optional): folder director
+        input (str or np.ndarray): folder directory or N x C x H x W array
         n (int): number of closest pairs to identify
         num_epochs (int): how long to train the autoencoder (more is generally better)
         show (bool): display the closest pairs
         show_train (bool): show output every
+        show_path (bool): show image paths of duplicates instead of index
         z_dim (int): size of compression (more is generally better, but slower)
         kwargs (dict): etc, passed to `EmbeddingExtractor`
 
     Returns:
-        pairs (list of lists): indices for closest pairs of images
+        pairs (np.ndarray): indices for closest pairs of images
         distances (np.ndarray): distances of each pair to each other
 
     """
-    if array is not None:
+    if isinstance(input, np.ndarray):
         extractor = EmbeddingExtractor(
-            input=array,
+            input=input,
             num_epochs=num_epochs,
             num_channels=num_channels,
+            show=show,
             show_train=show_train,
+            z_dim=z_dim,
             **kwargs
         )
-    elif data_dir is not None:
+    elif isinstance(input, str):
         extractor = EmbeddingExtractor(
-            input=data_dir,
+            input=input,
             num_epochs=num_epochs,
             num_channels=num_channels,
+            show=show,
             show_train=show_train,
+            show_path=show_path,
+            z_dim=z_dim,
             **kwargs
         )
 
@@ -128,15 +137,17 @@ def find_duplicates(
 
 
 def main():
+    """Main entry point for `simages-show` via command line."""
     args = parse_arguments(sys.argv[1:])
 
     find_duplicates(
-        data_dir=args.data_dir,
+        input=args.data_dir,
         n=args.pairs,
         num_epochs=args.epochs,
         num_channels=args.num_channels,
         show=True,
         show_train=args.show_train,
+        show_path=args.image_path,
     )
 
 

@@ -16,7 +16,7 @@ class Embeddings:
     Attributes:
         extractor (simages.EmbeddingExtractor): workhorse for extracting embeddings from dataset
         embeddings (np.ndarray): embeddings
-        pairs (list): n closest pairs
+        pairs (np.ndarray): n closest pairs
         distances (np.ndarray): distances between n-closest pairs
 
     """
@@ -61,6 +61,10 @@ class Embeddings:
         self.pairs, self.distances = closely.solve(self.embeddings, n=n)
 
         return self.pairs, self.distances
+
+    def show_duplicates(self, n=5):
+        """Convenience wrapper for `EmbeddingExtractor.show_duplicates`"""
+        return self.extractor.show_duplicates(n=n)
 
     def images_to_embeddings(self, data_dir: str, **kwargs):
         self.extractor = EmbeddingExtractor(data_dir, **kwargs)

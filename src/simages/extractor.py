@@ -6,9 +6,9 @@ import warnings
 import closely
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 import torch
 import torch.nn as nn
-from PIL import Image
 import torchvision
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
@@ -16,7 +16,7 @@ import torchvision.transforms.functional as TF
 import torch.utils.data as utils
 
 from .dataset import PILDataset, SingleFolderDataset
-from .models import BasicAutoencoder, Autoencoder
+from .models import BasicAutoencoder
 
 warnings.filterwarnings("ignore", message="Palette images with Transparency")
 log = logging.getLogger(__name__)
@@ -39,8 +39,9 @@ class EmbeddingExtractor:
         num_channels=None,
         num_epochs=2,
         batch_size=32,
-        show_train=True,
         show=False,
+        show_path=False,
+        show_train=True,
         z_dim=8,
         **kwargs,
     ):
@@ -51,21 +52,31 @@ class EmbeddingExtractor:
             num_channels (int): grayscale = 1, color = 3
             num_epochs (int): more is better (generally)
             batch_size (int): number of images per batch
-            show_train (bool): show intermediate training results
             show (bool): show closest pairs
+            show_path (bool): show path of duplicates
+            show_train (bool): show intermediate training results
             z_dim (int): compression size
             kwargs (dict)
 
         """
         self.num_epochs = num_epochs
         self._batch_size = batch_size
-        self._show_train = show_train
         self._show = show
+        self._show_path = show_path
+        self._show_train = show_train
 
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self._num_channels = num_channels
 
-        data_transforms = transforms.Compose(
+        train_transforms = transforms.Compose(
+            [
+                transforms.Resize(50),
+                transforms.CenterCrop(48),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+            ]
+        )
+        basic_transforms = transforms.Compose(
             [transforms.Resize(50), transforms.CenterCrop(48), transforms.ToTensor()]
         )
 
@@ -97,25 +108,31 @@ class EmbeddingExtractor:
             data_dir = os.path.abspath(input)
             hasdir = any([os.path.isdir(path) for path in os.listdir(data_dir)])
             if not hasdir:
-                self.image_dataset = SingleFolderDataset(
-                    input, transform=data_transforms, is_valid_file=is_valid
+                self.train_dataset = SingleFolderDataset(
+                    input, transform=train_transforms, is_valid_file=is_valid
+                )
+                self.eval_dataset = SingleFolderDataset(
+                    input, transform=basic_transforms, is_valid_file=is_valid
                 )
             else:
-                self.image_dataset = datasets.ImageFolder(
-                    root=data_dir, transform=data_transforms, is_valid_file=is_valid
+                self.train_dataset = datasets.ImageFolder(
+                    root=data_dir, transform=train_transforms, is_valid_file=is_valid
+                )
+                self.eval_dataset = datasets.ImageFolder(
+                    root=data_dir, transform=basic_transforms, is_valid_file=is_valid
                 )
             self.trainloader = torch.utils.data.DataLoader(
-                self.image_dataset, batch_size=batch_size, shuffle=True, num_workers=4
+                self.train_dataset, batch_size=batch_size, shuffle=True, num_workers=4
             )
             self.evalloader = torch.utils.data.DataLoader(
-                self.image_dataset, batch_size=batch_size, shuffle=False, num_workers=4
+                self.eval_dataset, batch_size=batch_size, shuffle=False, num_workers=4
             )
         elif isinstance(input, np.ndarray):
             self.trainloader = self.tensor_dataloader(
-                input, data_transforms, shuffle=True
+                input, train_transforms, shuffle=True
             )
             self.evalloader = self.tensor_dataloader(
-                input, data_transforms, shuffle=False
+                input, basic_transforms, shuffle=False
             )
 
         if not torch.cuda.is_available():
@@ -191,7 +208,11 @@ class EmbeddingExtractor:
                     output_array = output.detach().cpu()[0]
 
                     grid_img = torchvision.utils.make_grid([img_array, output_array])
-                    self.show(grid_img, title=f"Epoch {epoch}", block=False)
+                    self.show(
+                        grid_img,
+                        title=f"Building embeddings: epoch {epoch}/{self.num_epochs}",
+                        block=False,
+                    )
                 except Exception as e:
                     log.error(f"{e}")
 
@@ -258,7 +279,12 @@ class EmbeddingExtractor:
         tensors = [self.get_image(idx) for idx in indices]
         self.show(torchvision.utils.make_grid(tensors), title=title)
 
-    def show_duplicates(self, n=5):
+    def image_path(self, index):
+        """Get path to image at `index` of eval/embedding"""
+        return self.evalloader.dataset.samples[index]
+
+    def show_duplicates(self, n=5, path=False):
+        show_path = path or self._show_path
         pairs, distances = self.duplicates(n=n)
 
         # Plot pairs
@@ -267,11 +293,17 @@ class EmbeddingExtractor:
             img1 = self.get_image(pair[1])
             img0_reconst = self.decode(index=pair[0])[0]
             img1_reconst = self.decode(index=pair[1])[0]
+            pair_details = (
+                f"{self.image_path(pair[0])}\n{self.image_path(pair[1])}"
+                if show_path
+                else pair
+            )
+            title = f"{pair_details}, dist={distances[idx]:.2f}"
             self.show(
                 torchvision.utils.make_grid(
                     [img0, img1, img0_reconst, img1_reconst], nrow=2
                 ),
-                title=f"{pair}, dist={distances[idx]:.2f}",
+                title=title,
             )
 
         return pairs, distances

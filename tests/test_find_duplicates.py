@@ -1,5 +1,3 @@
-import sys
-
 import matplotlib
 
 matplotlib.use("Agg")
@@ -19,5 +17,5 @@ def test_find_duplicates(hw):
     pairs, distances = embeddings.duplicates(n=n)
     assert len(pairs) >= n
 
-    pairs, distances = find_duplicates(array=data, num_channels=1, show_train=False)
+    pairs, distances = find_duplicates(data, num_channels=1, show_train=False)
     assert len(pairs) >= n
