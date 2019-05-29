@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Union
+from typing import Union, Optional
 import warnings
 
 import closely
@@ -36,12 +36,12 @@ class EmbeddingExtractor:
     def __init__(
         self,
         input: Union[str, np.ndarray],
-        num_channels=None,
+        num_channels=3,
         num_epochs=2,
         batch_size=32,
         show=False,
         show_path=False,
-        show_train=True,
+        show_train=False,
         z_dim=8,
         **kwargs,
     ):
@@ -128,10 +128,10 @@ class EmbeddingExtractor:
                 self.eval_dataset, batch_size=batch_size, shuffle=False, num_workers=4
             )
         elif isinstance(input, np.ndarray):
-            self.trainloader = self.tensor_dataloader(
+            self.trainloader = self._tensor_dataloader(
                 input, train_transforms, shuffle=True
             )
-            self.evalloader = self.tensor_dataloader(
+            self.evalloader = self._tensor_dataloader(
                 input, basic_transforms, shuffle=False
             )
 
@@ -153,6 +153,16 @@ class EmbeddingExtractor:
         self.train()
         self.eval()
 
+    def _truncate_middle(self, string: str, n: int):
+        if len(string) <= n:
+            # string is already short-enough
+            return string
+        # half of the size, minus the 3 .'s
+        n_2 = int(int(n) / 2 - 3)
+        # whatever's left
+        n_1 = int(n - n_2 - 3)
+        return f"{string[:n_1]}...{string[-n_2:]}"
+
     def get_image(self, index: int):
         result = self.evalloader.dataset[index]
         if isinstance(result, tuple):
@@ -160,7 +170,12 @@ class EmbeddingExtractor:
         else:
             return result.cpu()
 
-    def tensor_dataloader(self, array, transforms, shuffle=True):
+    def _tensor_dataloader(
+        self,
+        array: np.ndarray,
+        transforms: torchvision.transforms.Compose,
+        shuffle: bool = True,
+    ) -> utils.DataLoader:
         log.debug(f"INFO: data shape: {array.shape} (Target: N x C x H x W)")
         if array.ndim == 3:
             log.debug(
@@ -176,16 +191,6 @@ class EmbeddingExtractor:
             dataset, batch_size=self._batch_size, shuffle=shuffle
         )  # create your dataloader
         return dataloader
-
-    def pil_loader(self, path):
-        log.info("loading {}".format(path))
-        channels = "RGB" if self._num_channels >= 3 else "L"
-        try:
-            with open(path, "rb") as f:
-                img = Image.open(f)
-                return img.convert(channels)
-        except:
-            log.error("fail to load {} using PIL".format(img))
 
     def train(self):
         for epoch in range(self.num_epochs):
@@ -210,7 +215,7 @@ class EmbeddingExtractor:
                     grid_img = torchvision.utils.make_grid([img_array, output_array])
                     self.show(
                         grid_img,
-                        title=f"Building embeddings: epoch {epoch}/{self.num_epochs}",
+                        title=f"Building embeddings: epoch [{epoch+1}/{self.num_epochs}]",
                         block=False,
                     )
                 except Exception as e:
@@ -256,11 +261,13 @@ class EmbeddingExtractor:
 
         self.embeddings = torch.cat(embeddings).detach().cpu().numpy()
 
-    def duplicates(self, n: int = 10):
+    def duplicates(self, n: int = 10) -> (np.ndarray, np.ndarray):
         pairs, distances = closely.solve(self.embeddings, n=n)
         return pairs, distances
 
-    def show(self, img, title="", block=True):
+    def show(
+        self, img: Union[torch.Tensor, np.ndarray], title: str = "", block: bool = True
+    ):
         if isinstance(img, torch.Tensor):
             npimg = img.detach().numpy()
         elif isinstance(img, np.ndarray):
@@ -279,9 +286,12 @@ class EmbeddingExtractor:
         tensors = [self.get_image(idx) for idx in indices]
         self.show(torchvision.utils.make_grid(tensors), title=title)
 
-    def image_path(self, index):
+    def image_path(self, index, short=True):
         """Get path to image at `index` of eval/embedding"""
-        return self.evalloader.dataset.samples[index]
+        path = self.evalloader.dataset.samples[index]
+        if short:
+            return self._truncate_middle(os.path.basename(path), 30)
+        return path
 
     def show_duplicates(self, n=5, path=False):
         show_path = path or self._show_path
@@ -308,7 +318,13 @@ class EmbeddingExtractor:
 
         return pairs, distances
 
-    def decode(self, embedding=None, index=None, show=False):
+    def decode(
+        self,
+        embedding: Optional[np.ndarray] = None,
+        index: Optional[int] = None,
+        show: bool = False,
+    ) -> np.ndarray:
+        """Decode `embedding`"""
         self.model.eval()
 
         if embedding is None:
@@ -318,12 +334,12 @@ class EmbeddingExtractor:
 
         # Check if has direct access to `decode` method
         if not hasattr(self.model, "decode"):
-            output, _ = self.model.module.decode(torch.Tensor(emb).to(self._device))
+            image, _ = self.model.module.decode(torch.Tensor(emb).to(self._device))
         else:
-            output, _ = self.model.decode(torch.Tensor(emb).to(self._device))
+            image, _ = self.model.decode(torch.Tensor(emb).to(self._device))
 
         if show:
-            grid_img = torchvision.utils.make_grid(output)
+            grid_img = torchvision.utils.make_grid(image)
             self.show(grid_img, title=index)
 
-        return output
+        return image
