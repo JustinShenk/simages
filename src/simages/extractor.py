@@ -342,4 +342,4 @@ class EmbeddingExtractor:
             grid_img = torchvision.utils.make_grid(image)
             self.show(grid_img, title=index)
 
-        return image
+        return image.detach().cpu().numpy()

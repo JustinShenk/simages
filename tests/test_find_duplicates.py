@@ -4,7 +4,7 @@ matplotlib.use("Agg")
 import numpy as np
 import pytest
 
-from simages import find_duplicates, Embeddings
+from simages import find_duplicates, Embeddings, EmbeddingExtractor
 
 
 @pytest.mark.parametrize("hw", [48, 64])
@@ -19,3 +19,15 @@ def test_find_duplicates(hw):
 
     pairs, distances = find_duplicates(data, num_channels=1, show_train=False)
     assert len(pairs) >= n
+
+def test_extract_embeddings():
+    data = np.random.random((100, 28, 28))
+    data = data[:, np.newaxis, ...]
+    extractor = EmbeddingExtractor(data, num_channels=1)
+    pairs, distances = extractor.duplicates(n=10)
+    assert isinstance(pairs, np.ndarray)
+    assert isinstance(distances, np.ndarray)
+
+    extractor.show_images([1,2])
+    image = extractor.decode(index=5)
+    assert isinstance(image, np.ndarray)
