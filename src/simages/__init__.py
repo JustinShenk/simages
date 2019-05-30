@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from .dataset import PILDataset, SingleFolderDataset
+from .models import BasicAutoencoder
 from .embeddings import Embeddings
 from .extractor import EmbeddingExtractor
 from .main import find_duplicates
@@ -17,3 +19,12 @@ __email__ = "shenkjustin@gmail.com"
 
 __license__ = "MIT"
 __copyright__ = "Copyright (c) 2019 " + __author__
+
+__all__ = [
+    "Embeddings",
+    "EmbeddingExtractor",
+    "find_duplicates",
+    "PILDataset",
+    "SingleFolderDataset",
+    "BasicAutoencoder",
+]

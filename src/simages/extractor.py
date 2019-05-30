@@ -18,6 +18,7 @@ import torch.utils.data as utils
 from .dataset import PILDataset, SingleFolderDataset
 from .models import BasicAutoencoder
 
+
 warnings.filterwarnings("ignore", message="Palette images with Transparency")
 log = logging.getLogger(__name__)
 
@@ -36,13 +37,13 @@ class EmbeddingExtractor:
     def __init__(
         self,
         input: Union[str, np.ndarray],
-        num_channels=3,
-        num_epochs=2,
-        batch_size=32,
-        show=False,
-        show_path=False,
-        show_train=False,
-        z_dim=8,
+        num_channels:int=3,
+        num_epochs:int=2,
+        batch_size:int=32,
+        show:bool=False,
+        show_path:bool=False,
+        show_train:bool=False,
+        z_dim:int =8,
         **kwargs,
     ):
         """Inits EmbeddingExtractor with input, either `str` or `np.nd.array`, performs training and validation.
@@ -189,10 +190,11 @@ class EmbeddingExtractor:
         dataset = PILDataset(pil_list, transform=transforms)
         dataloader = utils.DataLoader(
             dataset, batch_size=self._batch_size, shuffle=shuffle
-        )  # create your dataloader
+        )
         return dataloader
 
     def train(self):
+        """Train autoencoder to build embeddings of dataset. Final embeddings are created in `eval`."""
         for epoch in range(self.num_epochs):
             for data in self.trainloader:
                 if isinstance(data, list):
@@ -227,8 +229,11 @@ class EmbeddingExtractor:
             )
 
     def eval(self):
+        """Evaluate reconstruction of embeddings built in `train`."""
         embeddings = []
         imgs = []
+
+        # Change model to `eval` mode so weights are frozen
         self.model.eval()
 
         for data in self.evalloader:
@@ -265,9 +270,22 @@ class EmbeddingExtractor:
         pairs, distances = closely.solve(self.embeddings, n=n)
         return pairs, distances
 
+    @staticmethod
+    def channels_last(img:np.ndarray):
+        """Move channels from first to last by swapping axes."""
+        img_t = np.transpose(img, (1, 2, 0))
+        return img_t
+
     def show(
         self, img: Union[torch.Tensor, np.ndarray], title: str = "", block: bool = True
     ):
+        """Plot `img` with `title`.
+
+        Args:
+            img (torch.Tensor or np.ndarray): Image to plot
+            title (str): plot title
+            block (bool): block matplotlib plot until window closed
+        """
         if isinstance(img, torch.Tensor):
             npimg = img.detach().numpy()
         elif isinstance(img, np.ndarray):
@@ -275,12 +293,15 @@ class EmbeddingExtractor:
         else:
             raise NotImplementedError(f"{type(img)}")
 
+        if img.shape[0] in [1,2,3]:
+            npimg = self.channels_last(npimg).squeeze()
         plt.subplots()
         plt.title(f"{title}")
-        plt.imshow(np.transpose(npimg, (1, 2, 0)).squeeze(), interpolation="nearest")
+        plt.imshow(npimg, interpolation="nearest")
         plt.show(block=block)
 
     def show_images(self, indices: Union[list, int], title=""):
+        """Plot images (from validation data) at `indices` with `title`"""
         if isinstance(indices, int):
             indices = [indices]
         tensors = [self.get_image(idx) for idx in indices]
@@ -294,6 +315,12 @@ class EmbeddingExtractor:
         return path
 
     def show_duplicates(self, n=5, path=False):
+        """Show duplicates from comparison of embeddings. Uses `closely` package to get pairs.
+
+        n (int): how many closest pairs to identify
+        path (bool): Plot pairs of images with abbreviated paths
+
+        """
         show_path = path or self._show_path
         pairs, distances = self.duplicates(n=n)
 
@@ -301,8 +328,8 @@ class EmbeddingExtractor:
         for idx, pair in enumerate(pairs):
             img0 = self.get_image(pair[0])
             img1 = self.get_image(pair[1])
-            img0_reconst = self.decode(index=pair[0])[0]
-            img1_reconst = self.decode(index=pair[1])[0]
+            img0_reconst = self.decode(index=pair[0], astensor=True)[0]
+            img1_reconst = self.decode(index=pair[1], astensor=True)[0]
             pair_details = (
                 f"{self.image_path(pair[0])}\n{self.image_path(pair[1])}"
                 if show_path
@@ -323,8 +350,20 @@ class EmbeddingExtractor:
         embedding: Optional[np.ndarray] = None,
         index: Optional[int] = None,
         show: bool = False,
+        astensor: bool = False,
     ) -> np.ndarray:
-        """Decode `embedding`"""
+        """Decode embeddings at `index` or pass `embedding` directly
+
+        Args:
+            embedding (np.ndarray, optional): embedding of image
+            index (int): index (of validation set / embeddings) to decode
+            show (bool): plot the results
+            astensor (bool): keep as torch.Tensor
+
+        Returns:
+            image (np.ndarray or torch.Tensor): reconstructed image from embedding
+
+        """
         self.model.eval()
 
         if embedding is None:
@@ -342,4 +381,6 @@ class EmbeddingExtractor:
             grid_img = torchvision.utils.make_grid(image)
             self.show(grid_img, title=index)
 
+        if astensor:
+            return image.detach().cpu()
         return image.detach().cpu().numpy()

@@ -4,11 +4,11 @@ import argparse
 import logging
 import os
 import sys
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 
-from simages import Embeddings, EmbeddingExtractor
+from .extractor import EmbeddingExtractor
 
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))

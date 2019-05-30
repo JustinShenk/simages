@@ -1,5 +1,4 @@
 import os
-import sys
 
 from torch.utils.data.dataset import Dataset
 from torchvision.datasets import VisionDataset
@@ -99,7 +98,7 @@ class SingleFolderDataset(VisionDataset):
 
 
 def make_dataset_wo_targets(dir, extensions=None, is_valid_file=None):
-    """Modified from torchvision `make_dataset`."""
+    """Modified from torchvision's `make_dataset`."""
     images = []
     dir = os.path.expanduser(dir)
     if not ((extensions is None) ^ (is_valid_file is None)):
