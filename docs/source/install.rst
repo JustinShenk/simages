@@ -40,8 +40,10 @@ To install optional dependencies run::
 
 .. _numpy: https://www.numpy.org
 
+.. _closely: https://github.com/justinshenk/closely
+
 .. _matplotlib: https://matplotlib.org
 
 .. _torch: https://pytorch.org
 
-.. _torch: https://pytorch.org/docs/stable/torchvision
+.. _torchvision: https://pytorch.org/docs/stable/torchvision

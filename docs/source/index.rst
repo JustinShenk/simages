@@ -6,7 +6,7 @@
 simages |version|
 =================
 
-Similar image detection in Python
+🐵 Similar image detection in Python 🐵
 
 simages allows detecting similar images in an image folder or numpy array.
 
@@ -21,7 +21,7 @@ images are then presented on screen.
 
    .. figure:: https://raw.githubusercontent.com/justinshenk/simages/master/images/simages_demo.gif
 
-      Demo of visualizing training (``show-images --show-train`` option) and found duplicates with the :ref:`simages-show command <cli>`.
+      Demo of visualizing training (``simages --show-train`` option) and found duplicates with the :ref:`simages-show command <cli>`.
 
 
 If you use simages in your publications, please cite "`simages: Similar image detection with Python. https://github.com/justinshenk/simages <https://github.com/justinshenk/simages>`_."
