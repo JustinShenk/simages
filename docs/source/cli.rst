@@ -1,14 +1,16 @@
-Command Line
-============
+Running simages from the console
+================================
 
-simages can be run locally via the terminal with ``simages-show``.
+ .. _my-reference-label:
+
+simages can be run locally in the terminal with ``simages-show``.
 
 Usage::
 
     simages-show --data-dir .
 
 
-Get help with ``simages-show --help``:
+See all the options for ``simages-show`` with ``simages-show --help``:
 
 .. argparse::
    :ref: simages.main.build_parser
