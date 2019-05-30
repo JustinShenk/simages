@@ -1,4 +1,5 @@
 import os
+from typing import Callable, Optional
 
 from torch.utils.data.dataset import Dataset
 from torchvision.datasets import VisionDataset
@@ -8,7 +9,7 @@ from torchvision.datasets.folder import default_loader, has_file_allowed_extensi
 class PILDataset(Dataset):
     """PIL dataset."""
 
-    def __init__(self, pil_list, transform=None):
+    def __init__(self, pil_list:list, transform:Optional[Callable]=None):
         """
         Args:
             pil_list (list of PIL images)
@@ -56,11 +57,11 @@ class SingleFolderDataset(VisionDataset):
 
     def __init__(
         self,
-        root,
-        loader=default_loader,
-        extensions=None,
-        transform=None,
-        is_valid_file=None,
+        root:str,
+        loader:Callable=default_loader,
+        extensions:Optional[list]=None,
+        transform:Optional[list]=None,
+        is_valid_file:Optional[Callable]=None,
     ):
         super(SingleFolderDataset, self).__init__(root)
         self.transform = transform
@@ -78,7 +79,7 @@ class SingleFolderDataset(VisionDataset):
 
         self.samples = samples
 
-    def __getitem__(self, index):
+    def __getitem__(self, index:int):
         """
         Args:
             index (int): Index
@@ -97,7 +98,7 @@ class SingleFolderDataset(VisionDataset):
         return len(self.samples)
 
 
-def make_dataset_wo_targets(dir, extensions=None, is_valid_file=None):
+def make_dataset_wo_targets(dir:str, extensions:Optional[list]=None, is_valid_file:Optional[Callable]=None):
     """Modified from torchvision's `make_dataset`."""
     images = []
     dir = os.path.expanduser(dir)

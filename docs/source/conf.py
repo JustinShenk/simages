@@ -222,7 +222,7 @@ intersphinx_mapping = {
 }
 
 autodoc_member_order = "bysource"
-autodoc_mock_imports = ["rpy2"]
+autodoc_mock_imports = ["torch"]
 
 
 def setup(app):

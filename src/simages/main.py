@@ -14,7 +14,7 @@ from .extractor import EmbeddingExtractor
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 
 
-def parse_arguments(args):
+def build_parser():
     parser = argparse.ArgumentParser(
         description="Find similar pairs of images in a folder"
     )
@@ -25,13 +25,6 @@ def parse_arguments(args):
         type=str,
         default=None,
         help="Folder containing image data",
-    )
-    parser.add_argument(
-        "--recursive",
-        "-r",
-        action="store_true",
-        default=False,
-        help="Recursively gather data from folders in `data_dir`",
     )
     parser.add_argument(
         "--show-train",
@@ -75,6 +68,10 @@ def parse_arguments(args):
     parser.add_argument(
         "--image-path", "-i", action="store_true", help="Show image paths of duplicates"
     )
+    return parser
+
+def parse_arguments(args):
+    parser = build_parser()
     args, unknown = parser.parse_known_args(args)
     return args
 

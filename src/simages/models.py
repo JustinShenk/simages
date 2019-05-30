@@ -49,7 +49,15 @@ class Autoencoder(nn.Module):
 
 
 class BasicAutoencoder(nn.Module):
-    def __init__(self, num_channels=1, z_dim=8, hw=48):
+    def __init__(self, num_channels:int=1, z_dim:int=8, hw=48):
+        """Basic autoencoder - default for simages.
+
+        Args:
+           num_channels (int): grayscale = 1, color = 3
+           z_dim (int): number of embedding units to compress image to
+           hw (int): height and width for input/output image
+
+        """
         super(BasicAutoencoder, self).__init__()
 
         self.input_channels = num_channels

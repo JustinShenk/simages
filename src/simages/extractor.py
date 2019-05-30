@@ -37,16 +37,17 @@ class EmbeddingExtractor:
     def __init__(
         self,
         input: Union[str, np.ndarray],
-        num_channels:int=3,
-        num_epochs:int=2,
-        batch_size:int=32,
-        show:bool=False,
-        show_path:bool=False,
-        show_train:bool=False,
-        z_dim:int =8,
+        num_channels: int = 3,
+        num_epochs: int = 2,
+        batch_size: int = 32,
+        show: bool = False,
+        show_path: bool = False,
+        show_train: bool = False,
+        z_dim: int = 8,
+        model:Optional[torch.nn.Module]=None,
         **kwargs,
     ):
-        """Inits EmbeddingExtractor with input, either `str` or `np.nd.array`, performs training and validation.
+        """Inits EmbeddingExtractor with input, either `str` or `np.ndarray`, performs training and validation.
 
         Args:
             input (np.ndarray or str): data
@@ -57,6 +58,7 @@ class EmbeddingExtractor:
             show_path (bool): show path of duplicates
             show_train (bool): show intermediate training results
             z_dim (int): compression size
+            model (torch.nn.Module, optional): class implementing same methods as :class:`~simages.BasicAutoencoder`
             kwargs (dict)
 
         """
@@ -141,7 +143,10 @@ class EmbeddingExtractor:
                 "Note: No GPU found, using CPU. Performance is improved on a CUDA-device."
             )
 
-        self.model = BasicAutoencoder(num_channels=num_channels, z_dim=z_dim)
+        if model is None:
+            self.model = BasicAutoencoder(num_channels=num_channels, z_dim=z_dim)
+        else:
+            self.model = model
 
         if torch.cuda.device_count() > 1:
             log.info("Let's use", torch.cuda.device_count(), "GPUs!")
@@ -194,7 +199,10 @@ class EmbeddingExtractor:
         return dataloader
 
     def train(self):
-        """Train autoencoder to build embeddings of dataset. Final embeddings are created in `eval`."""
+        """Train autoencoder to build embeddings of dataset. Final embeddings are created in
+        :meth:`~simages.extractor.EmbeddingExtractor.eval`.
+
+        """
         for epoch in range(self.num_epochs):
             for data in self.trainloader:
                 if isinstance(data, list):
@@ -271,7 +279,7 @@ class EmbeddingExtractor:
         return pairs, distances
 
     @staticmethod
-    def channels_last(img:np.ndarray):
+    def channels_last(img: np.ndarray):
         """Move channels from first to last by swapping axes."""
         img_t = np.transpose(img, (1, 2, 0))
         return img_t
@@ -293,7 +301,7 @@ class EmbeddingExtractor:
         else:
             raise NotImplementedError(f"{type(img)}")
 
-        if img.shape[0] in [1,2,3]:
+        if img.shape[0] in [1, 2, 3]:
             npimg = self.channels_last(npimg).squeeze()
         plt.subplots()
         plt.title(f"{title}")

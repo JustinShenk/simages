@@ -32,7 +32,7 @@ $ simages-show --data-dir .
 Usage:
 
 ```
-usage: simages-show [-h] [--data-dir DATA_DIR] [--recursive] [--show-train]
+usage: simages-show [-h] [--data-dir DATA_DIR] [--show-train]
                     [--epochs EPOCHS] [--num-channels NUM_CHANNELS]
                     [--pairs PAIRS] [--zdim ZDIM] [-s]
 ```
@@ -42,7 +42,6 @@ Optional arguments:
   -h, --help            show this help message and exit
   --data-dir DATA_DIR, -d DATA_DIR
                         Folder containing image data
-  --recursive, -r       Recursively gather data from folders in `data_dir`
   --show-train, -t      Show training of embedding extractor every epoch
   --epochs EPOCHS, -e EPOCHS
                         Number of passes of dataset through model for

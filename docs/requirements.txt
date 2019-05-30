@@ -1,6 +1,3 @@
-pytorch-cpu
-torchvision-cpu
-simages
 ipython
 numpy
 matplotlib
