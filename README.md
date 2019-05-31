@@ -113,7 +113,6 @@ def find_duplicates(
 from simages import Embeddings
 import numpy as np
 
-# X is an n x m numpy array
 N = 1000
 data = np.random.random((N, 28, 28))
 embeddings = Embeddings(data)
@@ -140,10 +139,9 @@ Out[1]: array([0.00148035, 0.00150703, 0.00158789, 0.00168699, 0.00168721])
 from simages import EmbeddingExtractor
 import numpy as np
 
-# X is an n x m numpy array
 N = 1000
 data = np.random.random((N, 28, 28))
-extractor = EmbeddingExtractor(data, num_channels=1)
+extractor = EmbeddingExtractor(data, num_channels=1) # grayscale
 
 # Show 10 closest pairs of images
 pairs, distances = extractor.show_duplicates(n=10)
