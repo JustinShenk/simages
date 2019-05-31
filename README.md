@@ -1,4 +1,4 @@
-# simages :monkey_face: :monkey_face:
+# :monkey_face: simages  :monkey_face:
 [![PyPI version](https://badge.fury.io/py/simages.svg)](https://badge.fury.io/py/simages) [![Build Status](https://travis-ci.com/justinshenk/simages.svg?branch=master)](https://travis-ci.com/justinshenk/simages)  [![Documentation Status](https://readthedocs.org/projects/simages/badge/?version=latest)](https://simages.readthedocs.io/en/latest/?badge=latest)
        [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/justinshenk/simages/master?filepath=demo.ipynb)
 
@@ -194,4 +194,4 @@ You can specify how many pairs you want to identify with `n`.
  
 ### How it works
 
-Simages uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely).
+*simages* uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely).
