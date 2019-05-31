@@ -2,9 +2,19 @@
 [![PyPI version](https://badge.fury.io/py/simages.svg)](https://badge.fury.io/py/simages) [![Build Status](https://travis-ci.com/justinshenk/simages.svg?branch=master)](https://travis-ci.com/justinshenk/simages)  [![Documentation Status](https://readthedocs.org/projects/simages/badge/?version=latest)](https://simages.readthedocs.io/en/latest/?badge=latest)
        [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/justinshenk/simages/master?filepath=demo.ipynb)
 
-Find similar images within a dataset. Useful for finding duplicates images.
+*simages* is an image duplicate (or similar image) finder. Useful for finding duplicates images within a dataset
+.
 
-### Getting Started
+### Install
+
+See the [installation docs](https://simages.readthedocs.io/en/latest/install.html) for all details. *simages* depends on
+the following packages:
+
+- [closely](https://github.com/justinshenk/closely)
+- [torch](https://pytorch.org)
+- [torchvision](https://pytorch.org)
+- scikit-learn
+- matplotlib
 
 ```bash
 pip install simages
@@ -21,7 +31,7 @@ pip install .
 
 ![simages_demo](images/simages_demo.gif)
 
-### Command Line
+### Usage
 
 In your console, enter the directory with images and use `simages-show`:
 
@@ -29,16 +39,11 @@ In your console, enter the directory with images and use `simages-show`:
 $ simages-show --data-dir .
 ```
 
-Usage:
-
 ```
 usage: simages-show [-h] [--data-dir DATA_DIR] [--show-train]
                     [--epochs EPOCHS] [--num-channels NUM_CHANNELS]
                     [--pairs PAIRS] [--zdim ZDIM] [-s]
-```
 
-Optional arguments:
-```
   -h, --help            show this help message and exit
   --data-dir DATA_DIR, -d DATA_DIR
                         Folder containing image data

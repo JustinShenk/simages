@@ -15,7 +15,7 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 import torch.utils.data as utils
 
-from .dataset import PILDataset, SingleFolderDataset
+from .dataset import PILDataset, SingleFolderDataset, DatasetDB
 from .models import BasicAutoencoder
 
 
@@ -44,7 +44,8 @@ class EmbeddingExtractor:
         show_path: bool = False,
         show_train: bool = False,
         z_dim: int = 8,
-        model:Optional[torch.nn.Module]=None,
+        model: Optional[torch.nn.Module] = None,
+        db: Optional = None,
         **kwargs,
     ):
         """Inits EmbeddingExtractor with input, either `str` or `np.ndarray`, performs training and validation.
@@ -143,10 +144,10 @@ class EmbeddingExtractor:
                 "Note: No GPU found, using CPU. Performance is improved on a CUDA-device."
             )
 
-        if model is None:
-            self.model = BasicAutoencoder(num_channels=num_channels, z_dim=z_dim)
-        else:
+        if model is not None:
             self.model = model
+        else:
+            self.model = BasicAutoencoder(num_channels=num_channels, z_dim=z_dim)
 
         if torch.cuda.device_count() > 1:
             log.info("Let's use", torch.cuda.device_count(), "GPUs!")

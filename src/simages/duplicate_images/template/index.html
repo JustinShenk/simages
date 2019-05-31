@@ -1,0 +1,127 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+
+{% macro image(img, size) -%}
+<div class="col-xs-{{ size }}">
+    <div class="thumbnail">
+        <img class="img-responsive" src="{{ img['file_name'] }}" alt="{{ img['file_name'] }}">
+        <div class="caption">
+            <h5 class="name">{{ img['file_name'] }}</h5>
+            <div class="file-size">{{ img['file_size'] | filesizeformat }}</div>
+            <div class="resolution">{{ img['image_size'] }}</div>
+            <div class="capture-time">{{ img['capture_time'] }}</div>
+            <div class="capture-time">{{ img['distance'] }}</div>
+            <button class="btn btn-danger delete-btn" role="button" data-name="{{ img['file_name'] }}" style="margin-top: 15px">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro pagination(current, total) -%}
+<nav>
+    <div class="pages text-center">
+        {{ current + 1 }} of {{ total }}
+    </div>
+    <ul class="pager">
+        {% if current == 0 %}
+        <li class="disabled"><span>Previous</span></li>
+        {% else %}
+        <li><a href="{{ current - 1}}.html">Previous</a></li>
+        {% endif %}
+
+        {% if current == (total - 1) %}
+        <li class="disabled"><span>Next</span></li>
+        {% else %}
+        <li><a href="{{ current + 1 }}.html">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{%- endmacro %}
+
+<body>
+    <div class="container">
+        {% for dup in duplicates %}
+        <div class="row" style="margin: 15px; margin-bottom: 30px;">
+            {% set names = dup['items'] %}
+            {% if names | count == 2 %}
+                {{ image(names[0], 6) }}
+                {{ image(names[1], 6) }}
+            {% elif names | count == 3 %}
+                {{ image(names[0], 4) }}
+                {{ image(names[1], 4) }}
+                {{ image(names[2], 4) }}
+            {% elif names | count == 4 %}
+                {{ image(names[0], 3) }}
+                {{ image(names[1], 3) }}
+                {{ image(names[2], 3) }}
+                {{ image(names[3], 3) }}
+            {% elif names | count == 5 %}
+                {{ image(names[0], 2) }}
+                {{ image(names[1], 2) }}
+                {{ image(names[2], 2) }}
+                {{ image(names[3], 2) }}
+                {{ image(names[4], 2) }}
+            {% elif names | count == 6 %}
+                {{ image(names[0], 2) }}
+                {{ image(names[1], 2) }}
+                {{ image(names[2], 2) }}
+                {{ image(names[3], 2) }}
+                {{ image(names[4], 2) }}
+                {{ image(names[5], 2) }}
+            {% elif names | count > 6 %}
+                {% for n in names %}
+                    {{ image(n, 1) }}
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        {{ pagination(current, total) }}
+    </div>
+
+    <div class="alert alert-danger alert-dismissible fade" role="alert" id="file-not-found-alert" style="position: fixed; top: 0; left: 0; width: 100%;">
+        <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>Error!</strong> File could not be found.
+    </div>
+
+    <script type="text/javascript">
+        $(function(){
+            $("[data-hide]").on("click", function(){
+                $(this).closest("." + $(this).attr("data-hide")).removeClass("in");
+            });
+        });
+
+        $(".delete-btn").click(function() {
+            var file_name = $(this).data("name");
+            var parent = $(this).parent().parent();
+
+            $.ajax({
+                url: 'http://127.0.0.1:5000/picture/' + encodeURIComponent(file_name),
+                // url: '/picture/%2FVolumes',
+                type: 'DELETE',
+                success: function(data) {
+                    if(data == "True") {
+                        parent.addClass('fade');
+                    }
+                    else {
+                        $('#file-not-found-alert').addClass('in');
+                    }
+                },
+                error: function() {
+                    console.log("Something went wrong...");
+                }
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -2,6 +2,5 @@ torch
 torchvision>=0.3.0
 closely
 scikit-learn
-numpy
 Pillow>=6.0.0
 matplotlib

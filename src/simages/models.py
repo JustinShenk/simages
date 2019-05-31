@@ -49,7 +49,7 @@ class Autoencoder(nn.Module):
 
 
 class BasicAutoencoder(nn.Module):
-    def __init__(self, num_channels:int=1, z_dim:int=8, hw=48):
+    def __init__(self, num_channels: int = 1, z_dim: int = 8, hw=48):
         """Basic autoencoder - default for simages.
 
         Args:

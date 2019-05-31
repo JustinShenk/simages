@@ -36,7 +36,7 @@ version = release = simages.__version__
 extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
     "IPython.sphinxext.ipython_directive",
-    'sphinxarg.ext',
+    "sphinxarg.ext",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.mathjax",
@@ -78,7 +78,7 @@ sphinx_gallery_conf = {
 # Napoleon settings
 napoleon_google_docstring = True
 
-# Add any paths that contain templates here, relative to this directory.
+# Add any paths that contain template here, relative to this directory.
 templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
@@ -125,11 +125,11 @@ html_theme = "sphinx_rtd_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-# Custom sidebar templates, must be a dictionary that maps document names
+# Custom sidebar template, must be a dictionary that maps document names
 # to template names.
 #
 # The default sidebars (for documents that don't match any pattern) are
-# defined by theme itself.  Builtin themes are using these templates by
+# defined by theme itself.  Builtin themes are using these template by
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
