@@ -6,7 +6,7 @@
 simages |version|
 =================
 
-🐵 Similar image detection in Python 🐵
+🐒 Similar image detection in Python 🐒
 
 *simages* allows detecting similar images in an image folder or numpy array.
 
