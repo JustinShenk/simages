@@ -11,6 +11,7 @@ Install with pip::
 
    pip install simages
 
+
 If you wish to install the latest development version, clone the GitHub_ repository and use the setup script::
 
    git clone https://github.com/justinshenk/simages.git
@@ -31,7 +32,7 @@ Installation with pip should also include all dependencies, but a complete list 
 - torch_
 - torchvision_
 
-The optional web-interface requires installing mongodb::
+The optional web and :ref:`simages command line interface <cli>` requires installing mongodb::
 
     sudo apt -y install mongodb-server
     # Disable Mongo service autostart
@@ -39,7 +40,7 @@ The optional web-interface requires installing mongodb::
     # Stop Mongo service
     sudo service mongodb stop
 
-To install optional dependencies (pymongo) run::
+To install optional dependencies (PyMongo and Flask) run::
 
   pip install 'simages[all]'
 
