@@ -64,10 +64,10 @@ PYTHON_REQUIRES = ">= 3.6"
 INSTALL_REQUIRES = ["numpy", "scipy", "torch", "torchvision", "Pillow", "closely"]
 EXTRAS_REQUIRE = {"docs": ["sphinx"],
                   "tests": ["coverage", "pytest"],
-                  "all":["pymongo","flask", "jinja2", "more-itertools","pymongo", "Flask-Cors", "dnspython","Werkzeug",
+                  "all":["pymongo","flask", "jinja>=2.10.1", "more-itertools","pymongo", "Flask-Cors", "dnspython","Werkzeug",
                          "python-magic", "termcolor"]}
 EXTRAS_REQUIRE["dev"] = (
-    EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["docs"] + ["wheel", "pre-commit"]
+    EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["docs"] + EXTRAS_REQUIRE["all"] + ["wheel", "pre-commit"]
 )
 
 VERSION = find_meta("version")

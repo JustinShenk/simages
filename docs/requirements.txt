@@ -12,7 +12,7 @@ codecov
 sphinx-argparse
 flask
 flask-cors
-jinja2
+jinja2>=2.10.1
 pymongo
 more-itertools
 dnspython
