@@ -1,9 +1,11 @@
-# simages :monkey_face: :monkey_face:
+# :monkey: simages :monkey:
 [![PyPI version](https://badge.fury.io/py/simages.svg)](https://badge.fury.io/py/simages) [![Build Status](https://travis-ci.com/justinshenk/simages.svg?branch=master)](https://travis-ci.com/justinshenk/simages)  [![Documentation Status](https://readthedocs.org/projects/simages/badge/?version=latest)](https://simages.readthedocs.io/en/latest/?badge=latest)
        [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/justinshenk/simages/master?filepath=demo.ipynb)
 
-*simages* is an image duplicate (or similar image) finder. Useful for finding duplicates images within a dataset
-.
+
+Find similar images within a dataset. 
+
+Useful for removing duplicate images from a dataset after scraping images with [google-images-download](https://github.com/hardikvasa/google-images-download).
 
 The Python API returns `pairs, duplicates`, where pairs are the (ordered) closest pairs and distances is the 
 corresponding embedding distance.
@@ -171,7 +173,6 @@ def find_duplicates(
 from simages import Embeddings
 import numpy as np
 
-# X is an n x m numpy array
 N = 1000
 data = np.random.random((N, 28, 28))
 embeddings = Embeddings(data)
@@ -198,10 +199,9 @@ Out[1]: array([0.00148035, 0.00150703, 0.00158789, 0.00168699, 0.00168721])
 from simages import EmbeddingExtractor
 import numpy as np
 
-# X is an n x m numpy array
 N = 1000
 data = np.random.random((N, 28, 28))
-extractor = EmbeddingExtractor(data, num_channels=1)
+extractor = EmbeddingExtractor(data, num_channels=1) # grayscale
 
 # Show 10 closest pairs of images
 pairs, distances = extractor.show_duplicates(n=10)
@@ -252,4 +252,4 @@ You can specify how many pairs you want to identify with `n`.
  
 ### How it works
 
-Simages uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely).
+*simages* uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely).
