@@ -29,7 +29,8 @@ or install from source:
 
 ```bash
 git clone https://github.com/justinshenk/simages
-pip install simages
+cd simages
+pip install .
 ```
 
 ### Demo

@@ -14,7 +14,8 @@ Install with pip::
 If you wish to install the latest development version, clone the GitHub_ repository and use the setup script::
 
    git clone https://github.com/justinshenk/simages.git
-   pip install simages
+   cd simages
+   pip install .
 
 
 Next you can go to :doc:`the Command Line Interface <cli>`.
