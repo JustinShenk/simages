@@ -3,6 +3,8 @@ Loading Data
 
 Data is loaded using the :class:`~simages.extractor.EmbeddingExtractor` class.
 
+.. autoclass:: simages.extractor.EmbeddingExtractor
+
 **Numpy Array**
 
 Load data with::
