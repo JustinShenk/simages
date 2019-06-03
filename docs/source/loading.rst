@@ -34,8 +34,6 @@ Load data with::
 
 Duplicates can be identified using the ``simages`` command::
 
-.. code-block:: bash
-
     $ simages add `{image_folder}`
 
     $ simages find `{image_folder}`
