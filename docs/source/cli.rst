@@ -1,7 +1,7 @@
 .. _cli:
 
 Running simages from the console
-================================
+********************************
 
 simages can be run locally in the terminal with ``simages-show``.
 
@@ -14,9 +14,9 @@ See all the options for ``simages-show`` with ``simages-show --help``:
 
 .. argparse::
    :ref: simages.main.build_parser
-   :prog: simages
+   :prog: simages-show
 
-``simages-show`` calls :func:`~simages.main.find_duplicates`:
+``simages-show`` calls :func:`~simages.main.find_duplicates`.
 
 
 .. autofunction:: simages.main.find_duplicates
@@ -26,25 +26,26 @@ See all the options for ``simages-show`` with ``simages-show --help``:
 
 Alternatively, removing duplicate images in a dataset interactively is easy with ``simages``.
 
-- [Install mongodb](https://docs.mongodb.com/manual/installation/) on your system.
+- `Install mongodb <https://docs.mongodb.com/manual/installation/>`_ on your system.
 
 - Add images to the database via ``simages add {image_folder_path}``.
 
-- Find duplicates and run the web server with ``simages find``.
+- Find duplicates and run the web server with ``simages find {image_folder_path}``.
 
 
 Add your pictures to the database
 (this will take some time depending on the number of pictures)
 
-.. code-block::bash
+.. code-block:: bash
 
     simages add <images_folder_path>
 
 
-A webpage will come up with all of the similar or duplicate pictures
+A webpage will come up with all of the similar or duplicate pictures:
 
+.. image:: https://raw.githubusercontent.com/justinshenk/simages/master/images/screenshot_server.png
 
-.. code-block::bash
+.. code-block:: bash
 
     simages find <images_folder_path>
 

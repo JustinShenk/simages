@@ -1,3 +1,12 @@
+"""
+.. module:: extractor
+   :synopsis: Embedding extractor module
+
+.. moduleauthor:: Justin Shenk <shenkjustin@gmail.com>
+
+
+"""
+
 import logging
 import os
 from typing import Union, Optional

@@ -1,3 +1,12 @@
+"""
+.. module:: embedding
+   :synopsis: Embedding module
+
+.. moduleauthor:: Justin Shenk <shenkjustin@gmail.com>
+
+
+"""
+
 import os
 import glob
 from typing import Optional, Union

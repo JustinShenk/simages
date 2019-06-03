@@ -68,7 +68,6 @@ sphinx_gallery_conf = {
     "doc_module": ("simages",),
     "reference_url": {
         "numpy": "http://docs.scipy.org/doc/numpy",
-        "scipy": "http://docs.scipy.org/doc/scipy/reference",
     },
     "sphinx_gallery": None,
     "backreferences_dir": "reference",
@@ -218,7 +217,6 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org", None),
     "numpy": ("http://docs.scipy.org/doc/numpy", None),
     "matplotlib": ("http://matplotlib.sourceforge.net", None),
-    "scipy": ("http://docs.scipy.org/doc/scipy/reference", None),
 }
 
 autodoc_member_order = "bysource"

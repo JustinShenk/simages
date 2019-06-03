@@ -3,6 +3,12 @@
 A tool to find and remove duplicate pictures (CLI and webserver modified with permission from
 @philipbl's https://github.com/philipbl/duplicate_images).
 
+.. module:: main
+   :synopsis: Main point of entry for simages
+
+.. moduleauthor:: Justin Shenk <shenkjustin@gmail.com>, except for `cli` function.
+
+
 Command line::
 
     Usage:
