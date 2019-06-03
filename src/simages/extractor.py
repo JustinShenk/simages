@@ -9,7 +9,7 @@
 
 import logging
 import os
-from typing import Union, Optional
+from typing import Union, Optional, Tuple
 import warnings
 
 import closely
