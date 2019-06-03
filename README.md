@@ -142,7 +142,7 @@ pairs, distances = find_duplicates(data_dir)
 
 Default options for `find_duplicates` are:
 
-```
+```python
 def find_duplicates(
     input: Union[str or np.ndarray],
     n: int = 5,
@@ -249,8 +249,8 @@ class EmbeddingExtractor:
 
 ```
 
-You can specify how many pairs you want to identify with `n`.
+Specify tne number of pairs to identify with the parameter `n`.
  
 ### How it works
 
-*simages* uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely).
+*simages* uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely) :triangular_ruler:.
