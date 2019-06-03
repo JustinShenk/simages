@@ -112,3 +112,6 @@ _templates/
 
 # BUILD FILES
 *.zip
+
+Trash/
+db/
