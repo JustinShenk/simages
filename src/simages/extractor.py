@@ -15,7 +15,7 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 import torch.utils.data as utils
 
-from .dataset import PILDataset, SingleFolderDataset, DatasetDB
+from .dataset import PILDataset, ImageFolder, DatasetDB
 from .models import BasicAutoencoder
 
 
@@ -60,6 +60,7 @@ class EmbeddingExtractor:
             show_train (bool): show intermediate training results
             z_dim (int): compression size
             model (torch.nn.Module, optional): class implementing same methods as :class:`~simages.BasicAutoencoder`
+            db_conn_string (str): Mongodb connection string
             kwargs (dict)
 
         """
@@ -68,6 +69,7 @@ class EmbeddingExtractor:
         self._show = show
         self._show_path = show_path
         self._show_train = show_train
+        self._db = db
 
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self._num_channels = num_channels
@@ -108,23 +110,15 @@ class EmbeddingExtractor:
                 return False
             return True
 
+
         if isinstance(input, str):
             data_dir = os.path.abspath(input)
-            hasdir = any([os.path.isdir(path) for path in os.listdir(data_dir)])
-            if not hasdir:
-                self.train_dataset = SingleFolderDataset(
-                    input, transform=train_transforms, is_valid_file=is_valid
-                )
-                self.eval_dataset = SingleFolderDataset(
-                    input, transform=basic_transforms, is_valid_file=is_valid
-                )
-            else:
-                self.train_dataset = datasets.ImageFolder(
-                    root=data_dir, transform=train_transforms, is_valid_file=is_valid
-                )
-                self.eval_dataset = datasets.ImageFolder(
-                    root=data_dir, transform=basic_transforms, is_valid_file=is_valid
-                )
+            self.train_dataset = ImageFolder(
+                data_dir, transform=train_transforms, is_valid_file=is_valid
+            )
+            self.eval_dataset = ImageFolder(
+                data_dir, transform=basic_transforms, is_valid_file=is_valid
+            )
             self.trainloader = torch.utils.data.DataLoader(
                 self.train_dataset, batch_size=batch_size, shuffle=True, num_workers=4
             )
@@ -204,6 +198,8 @@ class EmbeddingExtractor:
         :meth:`~simages.extractor.EmbeddingExtractor.eval`.
 
         """
+        log.info(f"Building embeddings for {len(self.evalloader.dataset)} images. This may take some time...")
+
         for epoch in range(self.num_epochs):
             for data in self.trainloader:
                 if isinstance(data, list):
@@ -275,8 +271,17 @@ class EmbeddingExtractor:
 
         self.embeddings = torch.cat(embeddings).detach().cpu().numpy()
 
-    def duplicates(self, n: int = 10) -> (np.ndarray, np.ndarray):
-        pairs, distances = closely.solve(self.embeddings, n=n)
+    def duplicates(self, n: int = 10, quantile:float=None) -> (np.ndarray, np.ndarray):
+        """Identify `n` closest pairs of images, or quantile (for example, closest 0.05).
+
+        Args:
+            n (int): number of pairs
+            quantile (float): quantile of total combination (suggested range: 0.001 - 0.01)
+        """
+        if quantile is not None:
+            pairs, distances = closely.solve(self.embeddings, quantile=quantile)
+        else:
+            pairs, distances = closely.solve(self.embeddings, n=n)
         return pairs, distances
 
     @staticmethod

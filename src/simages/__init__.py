@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .dataset import PILDataset, SingleFolderDataset
+from .dataset import PILDataset, ImageFolder
 from .models import BasicAutoencoder
 from .embeddings import Embeddings
 from .extractor import EmbeddingExtractor
@@ -25,6 +25,6 @@ __all__ = [
     "EmbeddingExtractor",
     "find_duplicates",
     "PILDataset",
-    "SingleFolderDataset",
+    "ImageFolder",
     "BasicAutoencoder",
 ]

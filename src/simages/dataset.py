@@ -1,3 +1,4 @@
+import glob
 import os
 from typing import Callable, Optional
 
@@ -32,13 +33,12 @@ class PILDataset(Dataset):
         return sample
 
 
-class SingleFolderDataset(VisionDataset):
+class ImageFolder(VisionDataset):
     """A generic data loader where the samples are arranged in this way: ::
 
         root/xxx.ext
         root/xxy.ext
         root/xxz.ext
-
 
     Args:
         root (string): Root directory path.
@@ -64,7 +64,7 @@ class SingleFolderDataset(VisionDataset):
         transform: Optional[list] = None,
         is_valid_file: Optional[Callable] = None,
     ):
-        super(SingleFolderDataset, self).__init__(root)
+        super(ImageFolder, self).__init__(root)
         self.transform = transform
         samples = make_dataset_wo_targets(self.root, extensions, is_valid_file)
         if len(samples) == 0:
@@ -112,11 +112,11 @@ def make_dataset_wo_targets(
             "Both extensions and is_valid_file cannot be None or not None at the same time"
         )
     if extensions is not None:
-
         def is_valid_file(x):
             return has_file_allowed_extension(x, extensions)
 
-    for fname in sorted(os.listdir(dir)):
+    files = [f for f in glob.glob(os.path.join(dir, "**/*.*"), recursive=True)]
+    for fname in sorted(files):
         path = os.path.join(dir, fname)
         if is_valid_file(path):
             item = path

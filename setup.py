@@ -13,7 +13,7 @@ NAME = "simages"
 PACKAGES = find_packages(where="src")
 HERE = os.path.abspath(os.path.dirname(__file__))
 
-ENTRY_POINTS = {"console_scripts": ["simages-show = simages.main:main"]}
+ENTRY_POINTS = {"console_scripts": ["simages = simages.main:cli", "simages-show = simages.main:main"]}
 
 
 def read(*parts):

@@ -30,7 +30,6 @@ from subprocess import Popen, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
 
 import magic
-import imagehash
 from PIL import ExifTags, Image
 from more_itertools import chunked
 from termcolor import cprint
@@ -101,6 +100,9 @@ def hash_file(file):
         return file, file_size, image_size
     except OSError:
         cprint("\tUnable to open {}".format(file), "red")
+        return None
+    except Exception as e:
+        cprint("\tUnable to open {} - {}".format(file, e), "red")
         return None
 
 
@@ -343,6 +345,14 @@ def get_file_size(file_name):
 def get_image_size(img):
     return "{} x {}".format(*img.size)
 
+
+def query_paths(paths:list, db):
+    cur = db.find(
+        {"_id":
+             {"$in": paths}
+         }
+    )
+    return cur
 
 def get_capture_time(img):
     try:
