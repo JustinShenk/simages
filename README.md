@@ -32,7 +32,12 @@ pip install .
 
 ### Demo
 
+```simages-show```:
+
 ![simages_demo](images/simages_demo.gif)
+
+```simages add/find```:
+![simages_web_demo](images/screenshot_server.png)
 
 ### Usage
 

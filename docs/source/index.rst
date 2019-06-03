@@ -41,6 +41,7 @@ If you use simages in your publications, please cite "`simages: Similar image de
 
    Loading Data <loading>
    Building Embeddings <build>
+   Removing Duplicates <removing>
 
 .. toctree::
    :maxdepth: 1

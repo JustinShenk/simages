@@ -21,7 +21,7 @@ Load data with::
     pairs, distances = extractor.find_duplicates()
 
 
-**Image Folder**
+**Image Folder**::
 
     from simages import EmbeddingExtractor
 

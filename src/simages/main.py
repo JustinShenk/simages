@@ -110,6 +110,7 @@ def find_duplicates(
     show_train: bool = False,
     show_path: bool = False,
     z_dim: int = 8,
+    db = None,
     **kwargs
 ):
     """Find duplicates in dataset. Either `array` or `data_dir` must be specified.
