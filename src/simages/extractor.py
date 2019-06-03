@@ -109,7 +109,6 @@ class EmbeddingExtractor:
                 return False
             return True
 
-
         if isinstance(input, str):
             data_dir = os.path.abspath(input)
             self.train_dataset = ImageFolder(
@@ -197,7 +196,9 @@ class EmbeddingExtractor:
         :meth:`~simages.extractor.EmbeddingExtractor.eval`.
 
         """
-        log.info(f"Building embeddings for {len(self.evalloader.dataset)} images. This may take some time...")
+        log.info(
+            f"Building embeddings for {len(self.evalloader.dataset)} images. This may take some time..."
+        )
 
         for epoch in range(self.num_epochs):
             for data in self.trainloader:
@@ -223,7 +224,7 @@ class EmbeddingExtractor:
                         grid_img,
                         title=f"Building embeddings: epoch [{epoch+1}/{self.num_epochs}]",
                         block=False,
-                        y_labels=[(2, "Original"), (5, "Reconstruction")]
+                        y_labels=[(2, "Original"), (5, "Reconstruction")],
                     )
                 except Exception as e:
                     log.error(f"{e}")
@@ -271,7 +272,9 @@ class EmbeddingExtractor:
 
         self.embeddings = torch.cat(embeddings).detach().cpu().numpy()
 
-    def duplicates(self, n: int = 10, quantile:float=None) -> (np.ndarray, np.ndarray):
+    def duplicates(
+        self, n: int = 10, quantile: float = None
+    ) -> (np.ndarray, np.ndarray):
         """Identify `n` closest pairs of images, or quantile (for example, closest 0.05).
 
         Args:
@@ -291,7 +294,11 @@ class EmbeddingExtractor:
         return img_t
 
     def show(
-        self, img: Union[torch.Tensor, np.ndarray], title: str = "", block: bool = True, y_labels=None
+        self,
+        img: Union[torch.Tensor, np.ndarray],
+        title: str = "",
+        block: bool = True,
+        y_labels=None,
     ):
         """Plot `img` with `title`.
 
@@ -309,7 +316,7 @@ class EmbeddingExtractor:
 
         if img.shape[0] in [1, 2, 3]:
             npimg = self.channels_last(npimg).squeeze()
-        fig, ax = plt.subplots(1,1)
+        fig, ax = plt.subplots(1, 1)
         plt.title(f"{title}")
         ax.imshow(npimg, interpolation="nearest")
         if y_labels is not None:

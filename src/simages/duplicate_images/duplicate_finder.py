@@ -42,6 +42,7 @@ from jinja2 import FileSystemLoader, Environment
 
 import simages
 
+
 @contextmanager
 def connect_to_db(db_conn_string="./db"):
     p = None
@@ -109,13 +110,7 @@ def hash_file(file):
 
 def _add_to_database(file_, file_size, image_size, db):
     try:
-        db.insert_one(
-            {
-                "_id": file_,
-                "file_size": file_size,
-                "image_size": image_size,
-            }
-        )
+        db.insert_one({"_id": file_, "file_size": file_size, "image_size": image_size})
     except pymongo.errors.DuplicateKeyError:
         cprint("Duplicate key: {}".format(file_), "red")
 
@@ -146,12 +141,15 @@ def add(paths, db, num_processes=None):
 
 def find_pairs(paths, db, epochs):
     from simages import EmbeddingExtractor
-    if isinstance(paths, list): # TODO: Add support for multiple paths
+
+    if isinstance(paths, list):  # TODO: Add support for multiple paths
         path = paths[0]
     path = os.path.abspath(path)
     extractor = EmbeddingExtractor(path, num_epochs=epochs)
     pairs, distances = extractor.duplicates(n=10)
-    pairs_paths = [[extractor.image_path(ind, short=False) for ind in pair] for pair in pairs]
+    pairs_paths = [
+        [extractor.image_path(ind, short=False) for ind in pair] for pair in pairs
+    ]
 
     dups = []
     for idx, pair_paths in enumerate(pairs_paths):
@@ -162,22 +160,24 @@ def find_pairs(paths, db, epochs):
             cprint(f"Skipping {pairs_paths}", "yellow")
             continue
         dups.append(
-            {"_id": hash(idx), 'total': 2, 'items':
-                [
+            {
+                "_id": hash(idx),
+                "total": 2,
+                "items": [
                     {
-                        'file_name': pair_paths[0],
-                        'distance':format(float(distances[idx]), '.3f'),
-                        'file_size':img0['file_size'],
-                        'image_size': img0['image_size']
+                        "file_name": pair_paths[0],
+                        "distance": format(float(distances[idx]), ".3f"),
+                        "file_size": img0["file_size"],
+                        "image_size": img0["image_size"],
                     },
                     {
-                        'file_name': pair_paths[1],
-                        'distance':format(float(distances[idx]), '.3f'),
-                        'file_size': img1['file_size'],
-                        'image_size': img1['image_size']
-                    }
-                ]
-             }
+                        "file_name": pair_paths[1],
+                        "distance": format(float(distances[idx]), ".3f"),
+                        "file_size": img1["file_size"],
+                        "image_size": img1["image_size"],
+                    },
+                ],
+            }
         )
 
     return dups
@@ -220,6 +220,7 @@ def same_time(dup):
 
 def find(db, match_time=False):
     from bson.son import SON
+
     dups = db.aggregate(
         [
             {
@@ -276,7 +277,9 @@ def display_duplicates(duplicates, db, trash="./Trash/"):
     app.url_map.converters["everything"] = EverythingConverter
 
     def render(duplicates, current, total):
-        template_dir = os.path.join(os.path.dirname(simages.__file__), "duplicate_images", "template")
+        template_dir = os.path.join(
+            os.path.dirname(simages.__file__), "duplicate_images", "template"
+        )
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template("index.html")
         return template.render(duplicates=duplicates, current=current, total=total)
@@ -347,13 +350,10 @@ def get_image_size(img):
     return "{} x {}".format(*img.size)
 
 
-def query_paths(paths:list, db):
-    cur = db.find(
-        {"_id":
-             {"$in": paths}
-         }
-    )
+def query_paths(paths: list, db):
+    cur = db.find({"_id": {"$in": paths}})
     return cur
+
 
 def get_capture_time(img):
     try:
@@ -376,4 +376,5 @@ def delete_duplicates(duplicates, db):
 
 if __name__ == "__main__":
     from simages.main import cli
+
     cli()

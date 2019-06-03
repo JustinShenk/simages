@@ -13,7 +13,12 @@ NAME = "simages"
 PACKAGES = find_packages(where="src")
 HERE = os.path.abspath(os.path.dirname(__file__))
 
-ENTRY_POINTS = {"console_scripts": ["simages = simages.main:cli", "simages-show = simages.main:main"]}
+ENTRY_POINTS = {
+    "console_scripts": [
+        "simages = simages.main:cli",
+        "simages-show = simages.main:main",
+    ]
+}
 
 
 def read(*parts):
@@ -62,12 +67,27 @@ CLASSIFIERS = [
 
 PYTHON_REQUIRES = ">= 3.6"
 INSTALL_REQUIRES = ["numpy", "scipy", "torch", "torchvision", "Pillow", "closely"]
-EXTRAS_REQUIRE = {"docs": ["sphinx"],
-                  "tests": ["coverage", "pytest"],
-                  "all":["pymongo","flask", "jinja>=2.10.1", "more-itertools","pymongo", "Flask-Cors", "dnspython","Werkzeug",
-                         "python-magic", "termcolor"]}
+EXTRAS_REQUIRE = {
+    "docs": ["sphinx"],
+    "tests": ["coverage", "pytest"],
+    "all": [
+        "pymongo",
+        "flask",
+        "jinja>=2.10.1",
+        "more-itertools",
+        "pymongo",
+        "Flask-Cors",
+        "dnspython",
+        "Werkzeug",
+        "python-magic",
+        "termcolor",
+    ],
+}
 EXTRAS_REQUIRE["dev"] = (
-    EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["docs"] + EXTRAS_REQUIRE["all"] + ["wheel", "pre-commit"]
+    EXTRAS_REQUIRE["tests"]
+    + EXTRAS_REQUIRE["docs"]
+    + EXTRAS_REQUIRE["all"]
+    + ["wheel", "pre-commit"]
 )
 
 VERSION = find_meta("version")

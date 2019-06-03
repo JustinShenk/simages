@@ -114,6 +114,7 @@ def make_dataset_wo_targets(
             "Both extensions and is_valid_file cannot be None or not None at the same time"
         )
     if extensions is not None:
+
         def is_valid_file(x):
             return has_file_allowed_extension(x, extensions)
 
@@ -128,15 +129,16 @@ def make_dataset_wo_targets(
 
 
 class DatasetDB(Dataset):
-    def __init__(self, db_name='images', col_name='eval', transform=None):
+    def __init__(self, db_name="images", col_name="eval", transform=None):
         self._label_dtype = np.int32
         self.transform = transform
 
         from pymongo import MongoClient
-        client = MongoClient('localhost', 27017)
+
+        client = MongoClient("localhost", 27017)
         db = client[db_name]
         self.col = db[col_name]
-        self.examples = list(self.col.find({}, {'imgs': 0}))
+        self.examples = list(self.col.find({}, {"imgs": 0}))
 
     def __len__(self):
         return len(self.examples)
@@ -144,14 +146,15 @@ class DatasetDB(Dataset):
     def pil_loader(self, f):
         from PIL import Image
         import io
+
         with Image.open(io.BytesIO(f)) as img:
-            return img.convert('RGB')
+            return img.convert("RGB")
 
     def __getitem__(self, i):
-        _id = self.examples[i]['_id']
-        doc = self.col.find_one({'_id': _id})
+        _id = self.examples[i]["_id"]
+        doc = self.col.find_one({"_id": _id})
 
-        img = doc['imgs'][0]['picture']
+        img = doc["imgs"][0]["picture"]
         img = self.pil_loader(img)
 
         if self.transform:

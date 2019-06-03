@@ -114,7 +114,7 @@ def find_duplicates(
     show_train: bool = False,
     show_path: bool = False,
     z_dim: int = 8,
-    db = None,
+    db=None,
     **kwargs
 ):
     """Find duplicates in dataset. Either `array` or `data_dir` must be specified.
@@ -183,16 +183,25 @@ def find_similar(db):
     pairs, distances = extractor.duplicates()
     indices = pairs.flatten()
     import simages
+
     paths = [extractor.image_path(ind) for ind in indices]
     sims = simages.duplicate_images.duplicate_finder.query_paths(paths, db)
-
 
 
 def cli():
     from docopt import docopt
     from pprint import pprint
-    from simages.duplicate_images.duplicate_finder import connect_to_db,\
-        add, remove, clear, show, find, delete_duplicates, display_duplicates, find_pairs
+    from simages.duplicate_images.duplicate_finder import (
+        connect_to_db,
+        add,
+        remove,
+        clear,
+        show,
+        find,
+        delete_duplicates,
+        display_duplicates,
+        find_pairs,
+    )
 
     args = docopt(__doc__)
 
@@ -232,6 +241,7 @@ def cli():
                 print("Number of duplicates: {}".format(len(dups)))
             else:
                 display_duplicates(dups, db=db)
+
 
 if __name__ == "__main__":
     main()
