@@ -3,25 +3,29 @@
 A tool to find and remove duplicate pictures (CLI and webserver modified with permission from
 @philipbl's https://github.com/philipbl/duplicate_images).
 
-Usage:
-    simages add <path> ... [--db=<db_path>] [--parallel=<num_processes>]
-    simages remove <path> ... [--db=<db_path>]
-    simages clear [--db=<db_path>]
-    simages show [--db=<db_path>]
-    simages find <path> [--print] [--delete] [--match-time] [--trash=<trash_path>] [--db=<db_path>] [--epochs=<epochs>]
-    simages -h | --help
-Options:
-    -h, --help                Show this screen
-    --db=<db_path>            The location of the database or a MongoDB URI. (default: ./db)
-    --parallel=<num_processes> The number of parallel processes to run to hash the image
-                               files (default: number of CPUs).
-    find:
-        --print               Only print duplicate files rather than displaying HTML file
-        --delete              Move all found duplicate pictures to the trash. This option takes priority over --print.
-        --match-time          Adds the extra constraint that duplicate images must have the
-                              same capture times in order to be considered.
-        --trash=<trash_path>  Where files will be put when they are deleted (default: ./Trash)
-        --epochs=<epochs>     Epochs for training [default: 2]
+Command line::
+
+    Usage:
+        simages add <path> ... [--db=<db_path>] [--parallel=<num_processes>]
+        simages remove <path> ... [--db=<db_path>]
+        simages clear [--db=<db_path>]
+        simages show [--db=<db_path>]
+        simages find <path> [--print] [--delete] [--match-time] [--trash=<trash_path>] [--db=<db_path>] [--epochs=<epochs>]
+        simages -h | --help
+    Options:
+
+        -h, --help                Show this screen
+        --db=<db_path>            The location of the database or a MongoDB URI. (default: ./db)
+        --parallel=<num_processes> The number of parallel processes to run to hash the image
+                                   files (default: number of CPUs).
+        find:
+            --print               Only print duplicate files rather than displaying HTML file
+            --delete              Move all found duplicate pictures to the trash. This option takes priority over --print.
+            --match-time          Adds the extra constraint that duplicate images must have the
+                                  same capture times in order to be considered.
+            --trash=<trash_path>  Where files will be put when they are deleted (default: ./Trash)
+            --epochs=<epochs>     Epochs for training [default: 2]
+
 """
 
 import argparse

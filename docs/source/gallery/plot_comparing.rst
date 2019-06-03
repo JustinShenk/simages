@@ -49,12 +49,13 @@ simages allows comparing trajectories using various methods.
     import simages
     import numpy as np
 
-    X = np.random.random((100,28,28))
+    X = np.random.random((100, 28, 28))
     simages.find_duplicates(X, num_channels=1, show=True)
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.579 seconds)
+   **Total running time of the script:** ( 0 minutes  2.417 seconds)
 
 
 .. _sphx_glr_download_gallery_plot_comparing.py:

@@ -14,11 +14,10 @@ Install with pip::
 If you wish to install the latest development version, clone the GitHub_ repository and use the setup script::
 
    git clone https://github.com/justinshenk/simages.git
-   cd simages
-   pip install .
+   pip install simages
 
 
-Next you can go to :ref:`cli`.
+Next you can go to :doc:`the Command Line Interface <cli>`.
 
 Dependencies
 ------------
@@ -31,7 +30,15 @@ Installation with pip should also include all dependencies, but a complete list 
 - torch_
 - torchvision_
 
-To install optional dependencies run::
+The optional web-interface requires installing mongodb::
+
+    sudo apt -y install mongodb-server
+    # Disable Mongo service autostart
+    sudo systemctl disable mongodb.service
+    # Stop Mongo service
+    sudo service mongodb stop
+
+To install optional dependencies (pymongo) run::
 
   pip install 'simages[all]'
 

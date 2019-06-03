@@ -1,8 +1,5 @@
-Installation
+Loading Data
 ============
-
-Loading data
-------------
 
 Data is loaded using the :class:`~simages.extractor.EmbeddingExtractor` class.
 
@@ -35,10 +32,12 @@ Load data with::
     # Show duplicates
     extractor.show_duplicates(n=5)
 
-Duplicates can be identified using the ``simages`` command:
+Duplicates can be identified using the ``simages`` command::
 
-.. code-block::bash
+.. code-block:: bash
 
     $ simages add `{image_folder}`
 
     $ simages find `{image_folder}`
+
+Duplicates can be deleted on the webserver as described at :doc:`removing`.

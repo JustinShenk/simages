@@ -26,10 +26,10 @@ pip install simages
 ```
 
 or install from source:
+
 ```bash
 git clone https://github.com/justinshenk/simages
-cd simages
-pip install .
+pip install simages
 ```
 
 ### Demo

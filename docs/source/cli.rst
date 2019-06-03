@@ -1,7 +1,7 @@
+.. _cli:
+
 Running simages from the console
 ================================
-
- .. _my-reference-label:
 
 simages can be run locally in the terminal with ``simages-show``.
 

@@ -4,7 +4,7 @@ Removing Duplicates
 Web Server
 ----------
 
-Duplicates can be interactively removed with the :ref:`web interface <cli>`.
+Duplicates can be interactively removed with the :doc:`web interface <cli>`.
 
 .. image:: https://raw.githubusercontent.com/justinshenk/simages/master/images/screenshot_server.jpg
 
