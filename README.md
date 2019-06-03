@@ -94,7 +94,7 @@ A webpage will come up with all of the similar or duplicate pictures:
 simages find <images_folder_path>
 ```
 
-```bash
+```
 Usage:
     simages add <path> ... [--db=<db_path>] [--parallel=<num_processes>]
     simages remove <path> ... [--db=<db_path>]
