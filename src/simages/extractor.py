@@ -161,7 +161,7 @@ class EmbeddingExtractor:
         self.train()
         self.eval()
 
-    def _truncate_middle(self, string: str, n: int):
+    def _truncate_middle(self, string: str, n: int) -> str:
         if len(string) <= n:
             # string is already short-enough
             return string
@@ -171,7 +171,7 @@ class EmbeddingExtractor:
         n_1 = int(n - n_2 - 3)
         return f"{string[:n_1]}...{string[-n_2:]}"
 
-    def get_image(self, index: int):
+    def get_image(self, index: int) -> torch.Tensor:
         result = self.evalloader.dataset[index]
         if isinstance(result, tuple):
             return result[0].cpu()
@@ -283,7 +283,7 @@ class EmbeddingExtractor:
 
     def duplicates(
         self, n: int = 10, quantile: float = None
-    ) -> (np.ndarray, np.ndarray):
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Identify `n` closest pairs of images, or quantile (for example, closest 0.05).
 
         Args:
@@ -297,7 +297,7 @@ class EmbeddingExtractor:
         return pairs, distances
 
     @staticmethod
-    def channels_last(img: np.ndarray):
+    def channels_last(img: np.ndarray) -> np.ndarray:
         """Move channels from first to last by swapping axes."""
         img_t = np.transpose(img, (1, 2, 0))
         return img_t

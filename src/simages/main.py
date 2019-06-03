@@ -38,7 +38,7 @@ import argparse
 import logging
 import os
 import sys
-from typing import Union
+from typing import Union, Tuple
 
 import numpy as np
 
@@ -122,8 +122,8 @@ def find_duplicates(
     z_dim: int = 8,
     db=None,
     **kwargs
-):
-    """Find duplicates in dataset. Either `array` or `data_dir` must be specified.
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Find duplicates in dataset. Either np.ndarray or path to image folder must be specified as `input`.
 
     Args:
         input (str or np.ndarray): folder directory or N x C x H x W array

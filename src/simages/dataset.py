@@ -104,7 +104,7 @@ def make_dataset_wo_targets(
     dir: str,
     extensions: Optional[list] = None,
     is_valid_file: Optional[Callable] = None,
-):
+) -> list:
     """Modified from torchvision's `make_dataset`."""
     images = []
     dir = os.path.expanduser(dir)

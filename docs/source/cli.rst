@@ -12,17 +12,16 @@ Usage::
 
 See all the options for ``simages-show`` with ``simages-show --help``:
 
+.. currentmodule:: simages.main
+
 .. argparse::
    :ref: simages.main.build_parser
    :prog: simages-show
 
-``simages-show`` calls :func:`~simages.main.find_duplicates`.
+``simages-show`` calls :func:`~simages.main.find_duplicates`:
 
 
-.. autofunction:: simages.main.find_duplicates
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: find_duplicates
 
 Alternatively, removing duplicate images in a dataset interactively is easy with ``simages``.
 
@@ -33,8 +32,7 @@ Alternatively, removing duplicate images in a dataset interactively is easy with
 - Find duplicates and run the web server with ``simages find {image_folder_path}``.
 
 
-Add your pictures to the database
-(this will take some time depending on the number of pictures)
+Add your pictures to the database (this will take some time depending on the number of pictures)
 
 .. code-block:: bash
 
