@@ -10,7 +10,6 @@ from PIL import Image
 import torch
 import torch.nn as nn
 import torchvision
-import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 import torch.utils.data as utils
@@ -86,19 +85,19 @@ class EmbeddingExtractor:
             [transforms.Resize(50), transforms.CenterCrop(48), transforms.ToTensor()]
         )
 
-        img_extensions = [
-            ".jpg",
-            ".jpeg",
-            ".png",
-            ".ppm",
-            ".bmp",
-            ".pgm",
-            ".tif",
-            ".gif",
-            ".octet-stream",
-        ]
-
         def is_valid(path):
+            img_extensions = [
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".ppm",
+                ".bmp",
+                ".pgm",
+                ".tif",
+                ".gif",
+                ".octet-stream",
+            ]
+
             _, file_extension = os.path.splitext(path)
             valid_ext = file_extension.lower() in img_extensions
             if not valid_ext:
@@ -224,6 +223,7 @@ class EmbeddingExtractor:
                         grid_img,
                         title=f"Building embeddings: epoch [{epoch+1}/{self.num_epochs}]",
                         block=False,
+                        y_labels=[(2, "Original"), (5, "Reconstruction")]
                     )
                 except Exception as e:
                     log.error(f"{e}")
@@ -291,7 +291,7 @@ class EmbeddingExtractor:
         return img_t
 
     def show(
-        self, img: Union[torch.Tensor, np.ndarray], title: str = "", block: bool = True
+        self, img: Union[torch.Tensor, np.ndarray], title: str = "", block: bool = True, y_labels=None
     ):
         """Plot `img` with `title`.
 
@@ -309,9 +309,15 @@ class EmbeddingExtractor:
 
         if img.shape[0] in [1, 2, 3]:
             npimg = self.channels_last(npimg).squeeze()
-        plt.subplots()
+        fig, ax = plt.subplots(1,1)
         plt.title(f"{title}")
-        plt.imshow(npimg, interpolation="nearest")
+        ax.imshow(npimg, interpolation="nearest")
+        if y_labels is not None:
+            labels = [item.get_text() for item in ax.get_xticklabels()]
+            for idx, label in y_labels:
+                labels[idx] = label
+            ax.set_yticklabels(labels)
+
         plt.show(block=block)
 
     def show_images(self, indices: Union[list, int], title=""):

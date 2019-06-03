@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 A tool to find and remove duplicate pictures. Original author @philipbl, modified by @justinshenk.
+
 Usage:
     duplicate_finder.py add <path> ... [--db=<db_path>] [--parallel=<num_processes>]
     duplicate_finder.py remove <path> ... [--db=<db_path>]
@@ -374,41 +375,5 @@ def delete_duplicates(duplicates, db):
 
 
 if __name__ == "__main__":
-    from docopt import docopt
-
-    args = docopt(__doc__)
-
-    if args["--trash"]:
-        TRASH = args["--trash"]
-    else:
-        TRASH = "./Trash/"
-
-    if args["--db"]:
-        DB_PATH = args["--db"]
-    else:
-        DB_PATH = "./db"
-
-    if args["--parallel"]:
-        NUM_PROCESSES = int(args["--parallel"])
-    else:
-        NUM_PROCESSES = None
-
-    with connect_to_db(db_conn_string=DB_PATH) as db:
-        if args["add"]:
-            add(args["<path>"], db, NUM_PROCESSES)
-        elif args["remove"]:
-            remove(args["<path>"], db)
-        elif args["clear"]:
-            clear(db)
-        elif args["show"]:
-            show(db)
-        elif args["find"]:
-            dups = find(db, args["--match-time"])
-
-            if args["--delete"]:
-                delete_duplicates(dups, db)
-            elif args["--print"]:
-                pprint(dups)
-                print("Number of duplicates: {}".format(len(dups)))
-            else:
-                display_duplicates(dups, db=db)
+    from simages.main import cli
+    cli()

@@ -66,6 +66,7 @@ class ImageFolder(VisionDataset):
     ):
         super(ImageFolder, self).__init__(root)
         self.transform = transform
+
         samples = make_dataset_wo_targets(self.root, extensions, is_valid_file)
         if len(samples) == 0:
             raise (
@@ -107,6 +108,7 @@ def make_dataset_wo_targets(
     """Modified from torchvision's `make_dataset`."""
     images = []
     dir = os.path.expanduser(dir)
+
     if not ((extensions is None) ^ (is_valid_file is None)):
         raise ValueError(
             "Both extensions and is_valid_file cannot be None or not None at the same time"

@@ -1,9 +1,13 @@
+import os
+from pathlib import Path
+import pytest
+
 import matplotlib
 
 matplotlib.use("Agg")
 import numpy as np
-import pytest
 
+import simages
 from simages import find_duplicates, Embeddings, EmbeddingExtractor
 
 
@@ -32,3 +36,10 @@ def test_extract_embeddings():
     extractor.show_images([1, 2])
     image = extractor.decode(index=5)
     assert isinstance(image, np.ndarray)
+
+def test_conv_autoencoder():
+    image_dir = os.path.join(Path(simages.__file__).parents[2], 'images','balloons')
+    extractor = EmbeddingExtractor(image_dir,num_epochs=2)
+    pairs, distances = extractor.duplicates(n=5)
+    assert isinstance(pairs, np.ndarray)
+    assert isinstance(distances, np.ndarray)
