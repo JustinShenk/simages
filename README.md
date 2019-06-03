@@ -32,6 +32,8 @@ cd simages
 pip install .
 ```
 
+To install the web interface, [install mongodb](https://docs.mongodb.com/manual/installation/) and use rather `pip install "simages[all]"`.
+
 ### Demo
 
 ```simages-show```:
@@ -46,7 +48,7 @@ pip install .
 Two interfaces exist:
 
 - matplotlib interface which plots the duplicates for visual inspection
-- mongodb + web server interace which allows interactive deletion
+- mongodb + web server interace which allows interactive deletion [optional]
  
 #### Matplotlib interface
 
@@ -79,10 +81,11 @@ usage: simages-show [-h] [--data-dir DATA_DIR] [--show-train]
 
 ```
 
-#### Web Interface
+#### Web Interface [Optional]
 
-Add your pictures to the database
-(this will take some time depending on the number of pictures)
+Note: To install the web interface API, [install and run mongodb](https://docs.mongodb.com/manual/installation/) and use `pip install "simages[all]"` to install optional dependencies.
+
+Add your pictures to the database (this will take some time depending on the number of pictures)
 
 ```
 simages add <images_folder_path>
