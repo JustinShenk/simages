@@ -10,3 +10,12 @@ pytest
 pytest-cov
 codecov
 sphinx-argparse
+flask
+flask-cors
+jinja2
+pymongo
+more-itertools
+dnspython
+Werkzeug
+termcolor
+python-magic
