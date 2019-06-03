@@ -85,11 +85,11 @@ usage: simages-show [-h] [--data-dir DATA_DIR] [--show-train]
 Add your pictures to the database
 (this will take some time depending on the number of pictures)
 
-```bash
+```
 simages add <images_folder_path>
 ```
 
-A webpage will come up with all of the similar or duplicate pictures
+A webpage will come up with all of the similar or duplicate pictures:
 ```
 simages find <images_folder_path>
 ```
