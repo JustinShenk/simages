@@ -23,9 +23,14 @@ See all the options for ``simages-show`` with ``simages-show --help``:
 
 .. autofunction:: find_duplicates
 
+Web Interface (optional)
+========================
+
 Alternatively, removing duplicate images in a dataset interactively is easy with ``simages``.
 
 - `Install mongodb <https://docs.mongodb.com/manual/installation/>`_ on your system.
+
+- Install additional dependencies (Flask and PyMongo) with ``pip install "simages[all]"``
 
 - Add images to the database via ``simages add {image_folder_path}``.
 
