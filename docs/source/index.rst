@@ -8,13 +8,13 @@ simages |version|
 
 🐵 Similar image detection in Python 🐵
 
-simages allows detecting similar images in an image folder or numpy array.
+*simages* allows detecting similar images in an image folder or numpy array.
 
 Description
 -----------
 
-Detect similar images (eg, duplicates) in an image folder. Behind the curtain, simages uses a PyTorch autoencoder to
-train embeddings. The embeddings are compared with each other to create a distance matrix. The closest pairs of
+Detect similar images (eg, duplicates) in an image folder. Behind the curtain, *simages* uses a PyTorch autoencoder to
+train embeddings. The embeddings are compared with each other with `closely <https://github.com/justinshenk/closely>`_ to create a distance matrix. The closest pairs of
 images are then presented on screen.
 
 .. only:: html
@@ -24,7 +24,7 @@ images are then presented on screen.
       Demo of visualizing training (``simages-show --show-train`` option) and found duplicates with the :ref:`simages-show command <cli>`.
 
 
-If you use simages in your publications, please cite "`simages: Similar image detection with Python. https://github.com/justinshenk/simages <https://github.com/justinshenk/simages>`_."
+If you use *simages* in your publications, please cite "`simages: Similar image detection with Python. https://github.com/justinshenk/simages <https://github.com/justinshenk/simages>`_."
 
 
 .. toctree::
