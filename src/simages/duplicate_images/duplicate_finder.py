@@ -144,7 +144,7 @@ def add(paths, db, num_processes=None):
         cprint("...done", "blue")
 
 
-def find_pairs(paths, db, epochs=2):
+def find_pairs(paths, db, epochs):
     from simages import EmbeddingExtractor
     if isinstance(paths, list): # TODO: Add support for multiple paths
         path = paths[0]

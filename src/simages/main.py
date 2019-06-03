@@ -21,7 +21,7 @@ Options:
         --match-time          Adds the extra constraint that duplicate images must have the
                               same capture times in order to be considered.
         --trash=<trash_path>  Where files will be put when they are deleted (default: ./Trash)
-        --epochs=<epochs>     Epochs for training
+        --epochs=<epochs>     Epochs for training [default: 2]
 """
 
 import argparse

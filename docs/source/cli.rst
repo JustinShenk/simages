@@ -23,3 +23,15 @@ See all the options for ``simages-show`` with ``simages-show --help``:
     :members:
     :undoc-members:
     :show-inheritance:
+
+Alternatively, removing duplicate images in a dataset interactively is easy with ``simages``.
+
+- [Install mongodb](https://docs.mongodb.com/manual/installation/) on your system.
+
+- Add images to the database via ``simages add {image_folder_path}``.
+
+- Find duplicates and run the web server with ``simages find``.
+
+
+
+

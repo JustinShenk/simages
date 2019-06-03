@@ -32,3 +32,13 @@ Load data with::
     # Find duplicates
     pairs, distances = extractor.find_duplicates()
 
+    # Show duplicates
+    extractor.show_duplicates(n=5)
+
+Duplicates can be identified using the ``simages`` command:
+
+.. code-block::bash
+
+    $ simages add `{image_folder}`
+
+    $ simages find `{image_folder}`
