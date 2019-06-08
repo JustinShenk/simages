@@ -82,16 +82,27 @@ class EmbeddingExtractor:
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self._num_channels = num_channels
 
+        self._z_dim = z_dim
+        self._hw = 224
+
+        self._mean = [0.485, 0.456, 0.406]
+        self._std = [0.229, 0.224, 0.225]
+
         train_transforms = transforms.Compose(
             [
-                transforms.Resize(50),
-                transforms.CenterCrop(48),
+                transforms.RandomResizedCrop(self._hw),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
+                transforms.Normalize(self._mean, self._std),
             ]
         )
         basic_transforms = transforms.Compose(
-            [transforms.Resize(50), transforms.CenterCrop(48), transforms.ToTensor()]
+            [
+                transforms.Resize(self._hw),
+                transforms.CenterCrop(self._hw),
+                transforms.ToTensor(),
+                transforms.Normalize(self._mean, self._std)
+            ]
         )
 
         def is_valid(path):
@@ -228,7 +239,7 @@ class EmbeddingExtractor:
                     img_array = img.cpu()[0]
                     output_array = output.detach().cpu()[0]
 
-                    grid_img = torchvision.utils.make_grid([img_array, output_array])
+                    grid_img = torchvision.utils.make_grid([img_array, output_array], nrow=1)
                     self.show(
                         grid_img,
                         title=f"Building embeddings: epoch [{epoch+1}/{self.num_epochs}]",
@@ -271,8 +282,8 @@ class EmbeddingExtractor:
                 img_array = img.cpu()[0]
                 output_array = output.detach().cpu()[0]
 
-                grid_img = torchvision.utils.make_grid([img_array, output_array])
-                self.show(grid_img, title=f"Reconstruction")
+                grid_img = torchvision.utils.make_grid([img_array, output_array], nrow=1)
+                self.show(grid_img, title=f"Reconstruction", y_labels=[(2, "Original"), (5, "Reconstruction")])
             except Exception as e:
                 log.error(f"{e}")
 
@@ -294,6 +305,7 @@ class EmbeddingExtractor:
             pairs, distances = closely.solve(self.embeddings, quantile=quantile)
         else:
             pairs, distances = closely.solve(self.embeddings, n=n)
+
         return pairs, distances
 
     @staticmethod
@@ -308,6 +320,7 @@ class EmbeddingExtractor:
         title: str = "",
         block: bool = True,
         y_labels=None,
+        unnormalize=True
     ):
         """Plot `img` with `title`.
 
@@ -316,6 +329,8 @@ class EmbeddingExtractor:
             title (str): plot title
             block (bool): block matplotlib plot until window closed
         """
+        if unnormalize:
+            img = self.unnormalize(img)
         if isinstance(img, torch.Tensor):
             npimg = img.detach().numpy()
         elif isinstance(img, np.ndarray):
@@ -325,6 +340,7 @@ class EmbeddingExtractor:
 
         if img.shape[0] in [1, 2, 3]:
             npimg = self.channels_last(npimg).squeeze()
+
         fig, ax = plt.subplots(1, 1)
         plt.title(f"{title}")
         ax.imshow(npimg, interpolation="nearest")
@@ -377,9 +393,16 @@ class EmbeddingExtractor:
                     [img0, img1, img0_reconst, img1_reconst], nrow=2
                 ),
                 title=title,
+                y_labels=[(2, "Original"), (5, "Reconstruction")]
             )
 
         return pairs, distances
+
+
+    def unnormalize(self, image):
+        unorm = UnNormalize(mean=self._mean, std=self._std)
+        return unorm(image)
+
 
     def decode(
         self,
@@ -412,6 +435,8 @@ class EmbeddingExtractor:
             image, _ = self.model.module.decode(torch.Tensor(emb).to(self._device))
         else:
             image, _ = self.model.decode(torch.Tensor(emb).to(self._device))
+
+        image = self.unnormalize(image)
 
         if show:
             grid_img = torchvision.utils.make_grid(image)

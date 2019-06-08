@@ -1,3 +1,5 @@
+import torchvision
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -91,3 +93,68 @@ class BasicAutoencoder(nn.Module):
         x = x.view(x.size(0), self.input_channels, self.hw, self.hw)
         x = torch.sigmoid(x)
         return x, embedding
+
+
+def set_parameter_requires_grad(model, feature_extracting):
+    if feature_extracting:
+        for param in model.parameters():
+            param.requires_grad = False
+
+
+def pretrained_resnet(num_channels, hw, zdim, feature_extract = True):
+    model_ft = torchvision.models.resnet34(pretrained=True)
+    set_parameter_requires_grad(model_ft, feature_extract)
+    num_ftrs = model_ft.fc.in_features
+    # feature_model = list(model_ft.fc.children())
+    # feature_model.append(nn.Linear(num_ftrs, hw * hw * num_channels))
+    model_ft.fc = nn.Linear(num_ftrs, zdim)
+    return model_ft
+
+
+class PretrainedModel(nn.Module):
+    def __init__(self, hw, num_channels, zdim=8):
+        super(PretrainedModel, self).__init__()
+        self._hw = hw
+        self._num_channels = num_channels
+        self._zdim = zdim
+        self.model = pretrained_resnet(num_channels=num_channels, hw= hw, zdim=zdim)
+        self.fc_out = nn.Linear(zdim, hw*hw*num_channels)
+
+    def forward(self, input):
+        embedding = self.model.forward(input)
+        x, embedding = self.decode(embedding)
+        return x, embedding
+
+    def decode(self, embedding):
+        x = self.fc_out(embedding)
+        x = x.view(x.size(0), self._num_channels, self._hw, self._hw)
+        return x, embedding
+
+
+class Unflatten(nn.Module):
+    def __init__(self, hw, num_channels):
+        super(Unflatten, self).__init__()
+        self._hw = hw
+        self._num_channels = num_channels
+
+    def forward(self, input, embedding):
+        x = input.view(input.size(0), self._num_channels, self._hw, self._hw)
+        return x, embedding
+
+
+class UnNormalize(object):
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, tensor):
+        """
+        Args:
+            tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
+        Returns:
+            Tensor: Normalized image.
+        """
+        for t, m, s in zip(tensor, self.mean, self.std):
+            t.mul_(s).add_(m)
+            # The normalize code -> t.sub_(m).div_(s)
+        return tensor

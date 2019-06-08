@@ -99,9 +99,6 @@ def build_parser():
         default=8,
         help="Compression bits (bigger generally performs better but takes more time)",
     )
-    parser.add_argument(
-        "--image-path", "-i", action="store_true", help="Show image paths of duplicates"
-    )
     return parser
 
 
@@ -118,7 +115,7 @@ def find_duplicates(
     num_channels: int = 3,
     show: bool = False,
     show_train: bool = False,
-    show_path: bool = False,
+    show_path: bool = True,
     z_dim: int = 8,
     db=None,
     **kwargs
@@ -180,7 +177,7 @@ def main():
         num_channels=args.num_channels,
         show=True,
         show_train=args.show_train,
-        show_path=args.image_path,
+        show_path=True,
     )
 
 
