@@ -24,7 +24,16 @@ images are then presented on screen.
       Demo of visualizing training (``simages-show --show-train`` option) and found duplicates with the :ref:`simages-show command <cli>`.
 
 
-If you use *simages* in your publications, please cite "`simages: Similar image detection with Python. https://github.com/justinshenk/simages <https://github.com/justinshenk/simages>`_."
+If you use *simages* in your publications, please cite::
+
+    @misc{justin_shenk_2019_3237830,
+      author       = {Justin Shenk},
+      title        = {justinshenk/simages: v19.0.1},
+      month        = jun,
+      year         = 2019,
+      doi          = {10.5281/zenodo.3237830},
+      url          = {https://doi.org/10.5281/zenodo.3237830}
+    }
 
 
 .. toctree::

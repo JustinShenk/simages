@@ -256,3 +256,17 @@ Specify tne number of pairs to identify with the parameter `n`.
 ### How it works
 
 *simages* uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely) :triangular_ruler:.
+
+### Cite
+
+If you use simages, please cite it:
+```
+    @misc{justin_shenk_2019_3237830,
+      author       = {Justin Shenk},
+      title        = {justinshenk/simages: v19.0.1},
+      month        = jun,
+      year         = 2019,
+      doi          = {10.5281/zenodo.3237830},
+      url          = {https://doi.org/10.5281/zenodo.3237830}
+    }
+```
