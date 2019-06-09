@@ -66,9 +66,7 @@ sphinx_gallery_conf = {
     #'filename_pattern': '^((?!sgskip).)*$',
     "gallery_dirs": ["gallery"],
     "doc_module": ("simages",),
-    "reference_url": {
-        "numpy": "http://docs.scipy.org/doc/numpy",
-    },
+    "reference_url": {"numpy": "http://docs.scipy.org/doc/numpy"},
     "sphinx_gallery": None,
     "backreferences_dir": "reference",
     "within_subsection_order": FileNameSortKey,

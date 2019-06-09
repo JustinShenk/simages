@@ -178,7 +178,7 @@ def main():
         show=True,
         show_train=args.show_train,
         show_path=True,
-        metric='cosine'
+        metric="cosine",
     )
 
 
@@ -188,7 +188,7 @@ def find_similar(db):
     indices = pairs.flatten()
     import simages
 
-    paths = [extractor.image_path(ind) for ind in indices]
+    paths = [extractor.image_paths(ind) for ind in indices]
     sims = simages.duplicate_images.duplicate_finder.query_paths(paths, db)
 
 

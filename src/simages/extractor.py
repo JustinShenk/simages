@@ -35,7 +35,7 @@ class EmbeddingExtractor:
 
     Attributes:
         trainloader (torch loader)
-        evalloader (torch loader
+        evalloader (torch loader)
         model (torch.nn.Module)
         embeddings (np.ndarray)
 
@@ -51,7 +51,7 @@ class EmbeddingExtractor:
         show_path: bool = False,
         show_train: bool = False,
         z_dim: int = 8,
-        metric:str = 'cosine',
+        metric: str = "cosine",
         model: Optional[torch.nn.Module] = None,
         db: Optional = None,
         **kwargs,
@@ -103,7 +103,7 @@ class EmbeddingExtractor:
                 transforms.Resize(self._hw),
                 transforms.CenterCrop(self._hw),
                 transforms.ToTensor(),
-                transforms.Normalize(self._mean, self._std)
+                transforms.Normalize(self._mean, self._std),
             ]
         )
 
@@ -241,7 +241,9 @@ class EmbeddingExtractor:
                     img_array = img.cpu()[0]
                     output_array = output.detach().cpu()[0]
 
-                    grid_img = torchvision.utils.make_grid([img_array, output_array], nrow=1)
+                    grid_img = torchvision.utils.make_grid(
+                        [img_array, output_array], nrow=1
+                    )
                     self.show(
                         grid_img,
                         title=f"Building embeddings: epoch [{epoch+1}/{self.num_epochs}]",
@@ -284,8 +286,14 @@ class EmbeddingExtractor:
                 img_array = img.cpu()[0]
                 output_array = output.detach().cpu()[0]
 
-                grid_img = torchvision.utils.make_grid([img_array, output_array], nrow=1)
-                self.show(grid_img, title=f"Reconstruction", y_labels=[(2, "Original"), (5, "Reconstruction")])
+                grid_img = torchvision.utils.make_grid(
+                    [img_array, output_array], nrow=1
+                )
+                self.show(
+                    grid_img,
+                    title=f"Reconstruction",
+                    y_labels=[(2, "Original"), (5, "Reconstruction")],
+                )
             except Exception as e:
                 log.error(f"{e}")
 
@@ -304,7 +312,9 @@ class EmbeddingExtractor:
             quantile (float): quantile of total combination (suggested range: 0.001 - 0.01)
         """
         if quantile is not None:
-            pairs, distances = closely.solve(self.embeddings, quantile=quantile, metric=self._metric)
+            pairs, distances = closely.solve(
+                self.embeddings, quantile=quantile, metric=self._metric
+            )
         else:
             pairs, distances = closely.solve(self.embeddings, n=n, metric=self._metric)
 
@@ -322,7 +332,7 @@ class EmbeddingExtractor:
         title: str = "",
         block: bool = True,
         y_labels=None,
-        unnormalize=True
+        unnormalize=True,
     ):
         """Plot `img` with `title`.
 
@@ -361,18 +371,30 @@ class EmbeddingExtractor:
         tensors = [self.get_image(idx) for idx in indices]
         self.show(torchvision.utils.make_grid(tensors), title=title)
 
-    def image_path(self, index, short=True):
+    def image_paths(self, indices, short=True):
         """Get path to image at `index` of eval/embedding
 
         Args:
-            index (int): index of embeddings in dataset
+            indices Union[int,list]: indices of embeddings in dataset
             short (bool): truncate filepath to 30 charachters
 
+        Returns:
+            paths (str or list of str): paths to images in image folder
+
         """
-        path = self.evalloader.dataset.samples[index]
-        if short:
-            return self._truncate_middle(os.path.basename(path), 30)
-        return path
+        if isinstance(indices, int):
+            indices = [indices]
+
+        paths = []
+        for index in indices:
+            path = self.evalloader.dataset.samples[index]
+            if short:
+                path = self._truncate_middle(os.path.basename(path), 30)
+            paths.append(path)
+
+        if len(paths) == 1:
+            return paths[0] # backward compatibility
+        return paths
 
     def show_duplicates(self, n=5, path=False) -> (np.ndarray, np.ndarray):
         """Show duplicates from comparison of embeddings. Uses `closely` package to get pairs.
@@ -396,7 +418,7 @@ class EmbeddingExtractor:
             img0_reconst = self.decode(index=pair[0], astensor=True)[0]
             img1_reconst = self.decode(index=pair[1], astensor=True)[0]
             pair_details = (
-                f"{self.image_path(pair[0])}\n{self.image_path(pair[1])}"
+                f"{self.image_paths(pair[0])}\n{self.image_paths(pair[1])}"
                 if show_path
                 else pair
             )
@@ -406,13 +428,12 @@ class EmbeddingExtractor:
                     [img0, img1, img0_reconst, img1_reconst], nrow=2
                 ),
                 title=title,
-                y_labels=[(2, "Original"), (5, "Reconstruction")]
+                y_labels=[(2, "Original"), (5, "Reconstruction")],
             )
 
         return pairs, distances
 
-
-    def unnormalize(self, image:torch.Tensor) -> torch.Tensor:
+    def unnormalize(self, image: torch.Tensor) -> torch.Tensor:
         """Unnormalize an image.
 
         Args:
@@ -424,7 +445,6 @@ class EmbeddingExtractor:
         """
         unorm = UnNormalize(mean=self._mean, std=self._std)
         return unorm(image)
-
 
     def decode(
         self,

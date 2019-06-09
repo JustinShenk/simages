@@ -27,5 +27,5 @@ __all__ = [
     "PILDataset",
     "ImageFolder",
     "BasicAutoencoder",
-    "linkageplot"
+    "linkageplot",
 ]

@@ -101,7 +101,7 @@ def set_parameter_requires_grad(model, feature_extracting):
             param.requires_grad = False
 
 
-def pretrained_resnet(num_channels, hw, zdim, feature_extract = True):
+def pretrained_resnet(num_channels, hw, zdim, feature_extract=True):
     model_ft = torchvision.models.resnet34(pretrained=True)
     set_parameter_requires_grad(model_ft, feature_extract)
     num_ftrs = model_ft.fc.in_features
@@ -117,8 +117,8 @@ class PretrainedModel(nn.Module):
         self._hw = hw
         self._num_channels = num_channels
         self._zdim = zdim
-        self.model = pretrained_resnet(num_channels=num_channels, hw= hw, zdim=zdim)
-        self.fc_out = nn.Linear(zdim, hw*hw*num_channels)
+        self.model = pretrained_resnet(num_channels=num_channels, hw=hw, zdim=zdim)
+        self.fc_out = nn.Linear(zdim, hw * hw * num_channels)
 
     def forward(self, input):
         embedding = self.model.forward(input)

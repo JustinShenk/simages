@@ -219,7 +219,7 @@ class EmbeddingExtractor:
 
     Attributes:
         trainloader (torch loader)
-        evalloader (torch loader
+        evalloader (torch loader)
         model (torch.nn.Module)
         embeddings (np.ndarray)
 

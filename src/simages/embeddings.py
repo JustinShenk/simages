@@ -25,8 +25,9 @@ def linkageplot(embeddings: np.ndarray, ordered=True):
         ordered (bool): order distance matrix before plotting
 
     """
-    dist_mat = closely.distance_matrix(embeddings, metric='cosine', ordered=ordered)
+    dist_mat = closely.distance_matrix(embeddings, metric="cosine", ordered=ordered)
     return closely.show_linkage(dist_mat)
+
 
 class Embeddings:
     """Create embeddings from `input` data by training an autoencoder.
