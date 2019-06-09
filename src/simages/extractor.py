@@ -23,9 +23,8 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 import torch.utils.data as utils
 
-from .dataset import PILDataset, ImageFolder, DatasetDB
-from .models import BasicAutoencoder
-
+from .dataset import PILDataset, ImageFolder
+from .models import BasicAutoencoder, UnNormalize
 
 warnings.filterwarnings("ignore", message="Palette images with Transparency")
 log = logging.getLogger(__name__)
@@ -52,6 +51,7 @@ class EmbeddingExtractor:
         show_path: bool = False,
         show_train: bool = False,
         z_dim: int = 8,
+        metric:str = 'cosine',
         model: Optional[torch.nn.Module] = None,
         db: Optional = None,
         **kwargs,
@@ -67,6 +67,7 @@ class EmbeddingExtractor:
             show_path (bool): show path of duplicates
             show_train (bool): show intermediate training results
             z_dim (int): compression size
+            metric (str): distance metric for :meth:`scipy.spatial.distance.cdist` (eg, euclidean, cosine, hamming, etc.)
             model (torch.nn.Module, optional): class implementing same methods as :class:`~simages.BasicAutoencoder`
             db_conn_string (str): Mongodb connection string
             kwargs (dict)
@@ -82,11 +83,12 @@ class EmbeddingExtractor:
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self._num_channels = num_channels
 
+        self._metric = metric
         self._z_dim = z_dim
-        self._hw = 224
+        self._hw = 48
 
-        self._mean = [0.485, 0.456, 0.406]
-        self._std = [0.229, 0.224, 0.225]
+        self._mean = [0.5] * self._num_channels
+        self._std = [0.25] * self._num_channels
 
         train_transforms = transforms.Compose(
             [
@@ -302,9 +304,9 @@ class EmbeddingExtractor:
             quantile (float): quantile of total combination (suggested range: 0.001 - 0.01)
         """
         if quantile is not None:
-            pairs, distances = closely.solve(self.embeddings, quantile=quantile)
+            pairs, distances = closely.solve(self.embeddings, quantile=quantile, metric=self._metric)
         else:
-            pairs, distances = closely.solve(self.embeddings, n=n)
+            pairs, distances = closely.solve(self.embeddings, n=n, metric=self._metric)
 
         return pairs, distances
 
@@ -360,17 +362,28 @@ class EmbeddingExtractor:
         self.show(torchvision.utils.make_grid(tensors), title=title)
 
     def image_path(self, index, short=True):
-        """Get path to image at `index` of eval/embedding"""
+        """Get path to image at `index` of eval/embedding
+
+        Args:
+            index (int): index of embeddings in dataset
+            short (bool): truncate filepath to 30 charachters
+
+        """
         path = self.evalloader.dataset.samples[index]
         if short:
             return self._truncate_middle(os.path.basename(path), 30)
         return path
 
-    def show_duplicates(self, n=5, path=False):
+    def show_duplicates(self, n=5, path=False) -> (np.ndarray, np.ndarray):
         """Show duplicates from comparison of embeddings. Uses `closely` package to get pairs.
 
-        n (int): how many closest pairs to identify
-        path (bool): Plot pairs of images with abbreviated paths
+        Args:
+            n (int): how many closest pairs to identify
+            path (bool): Plot pairs of images with abbreviated paths
+
+        Returns:
+            pairs (np.ndarray): pairs as indices
+            distances (np.ndarray): distances of pairs
 
         """
         show_path = path or self._show_path
@@ -399,7 +412,16 @@ class EmbeddingExtractor:
         return pairs, distances
 
 
-    def unnormalize(self, image):
+    def unnormalize(self, image:torch.Tensor) -> torch.Tensor:
+        """Unnormalize an image.
+
+        Args:
+            image (:class:`torch.Tensor`)
+
+        Returns:
+            image (:class:`torch.Tensor`)
+
+        """
         unorm = UnNormalize(mean=self._mean, std=self._std)
         return unorm(image)
 

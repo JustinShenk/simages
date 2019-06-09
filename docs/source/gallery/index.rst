@@ -30,6 +30,26 @@ A gallery of examples
    :hidden:
 
    /gallery/plot_comparing
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Linkage">
+
+.. only:: html
+
+    .. figure:: /gallery/images/thumb/sphx_glr_plot_linkage_thumb.png
+
+        :ref:`sphx_glr_gallery_plot_linkage.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /gallery/plot_linkage
 .. raw:: html
 
     <div style='clear:both'></div>

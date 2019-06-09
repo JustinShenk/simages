@@ -1,7 +1,7 @@
 """
 Comparing
 ---------
-simages allows comparing trajectories using various methods.
+simages allows comparing images using various methods.
 """
 import simages
 import numpy as np

@@ -9,7 +9,7 @@
 
 Comparing
 ---------
-simages allows comparing trajectories using various methods.
+simages allows comparing images using various methods.
 
 
 .. rst-class:: sphx-glr-horizontal
@@ -55,7 +55,7 @@ simages allows comparing trajectories using various methods.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.417 seconds)
+   **Total running time of the script:** ( 0 minutes  2.831 seconds)
 
 
 .. _sphx_glr_download_gallery_plot_comparing.py:

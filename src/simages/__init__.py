@@ -2,11 +2,11 @@
 
 from .dataset import PILDataset, ImageFolder
 from .models import BasicAutoencoder
-from .embeddings import Embeddings
+from .embeddings import Embeddings, linkageplot
 from .extractor import EmbeddingExtractor
 from .main import find_duplicates
 
-__version__ = "19.0.1"
+__version__ = "19.0.2"
 
 __title__ = "simages"
 __description__ = "Find similar images in a dataset"
@@ -27,4 +27,5 @@ __all__ = [
     "PILDataset",
     "ImageFolder",
     "BasicAutoencoder",
+    "linkageplot"
 ]

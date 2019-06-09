@@ -178,6 +178,7 @@ def main():
         show=True,
         show_train=args.show_train,
         show_path=True,
+        metric='cosine'
     )
 
 

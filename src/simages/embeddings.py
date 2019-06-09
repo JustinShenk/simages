@@ -9,13 +9,24 @@
 
 import os
 import glob
-from typing import Optional, Union
+from typing import Union
 
 import closely
 import numpy as np
 
 from .extractor import EmbeddingExtractor
 
+
+def linkageplot(embeddings: np.ndarray, ordered=True):
+    """Plot linkage between embeddings in hierarchical clustering of the distance matrix
+
+    Args:
+        embeddings (np.ndarray): embeddings of images in dataset
+        ordered (bool): order distance matrix before plotting
+
+    """
+    dist_mat = closely.distance_matrix(embeddings, metric='cosine', ordered=ordered)
+    return closely.show_linkage(dist_mat)
 
 class Embeddings:
     """Create embeddings from `input` data by training an autoencoder.
