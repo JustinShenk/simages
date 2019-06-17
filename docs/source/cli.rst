@@ -30,8 +30,6 @@ Alternatively, removing duplicate images in a dataset interactively is easy with
 
 - `Install mongodb <https://docs.mongodb.com/manual/installation/>`_ on your system.
 
-- Install additional dependencies (Flask and PyMongo) with ``pip install "simages[all]"``
-
 - Add images to the database via ``simages add {image_folder_path}``.
 
 - Find duplicates and run the web server with ``simages find {image_folder_path}``.
