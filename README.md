@@ -261,8 +261,8 @@ the following packages:
 - scikit-learn
 - matplotlib
 
-Optional dependencies, installed with `pip install simages[all]` include:
-
+The following dependencies are required for the interactive deleting interface:
+ 
 - pymongodb
 - fastcluster
 - flask
