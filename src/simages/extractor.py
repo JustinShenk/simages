@@ -382,7 +382,7 @@ class EmbeddingExtractor:
             paths (str or list of str): paths to images in image folder
 
         """
-        if isinstance(indices, int):
+        if isinstance(indices, (int, np.int_)):
             indices = [indices]
 
         paths = []

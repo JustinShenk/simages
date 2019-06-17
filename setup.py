@@ -66,7 +66,7 @@ CLASSIFIERS = [
 ]
 
 PYTHON_REQUIRES = ">= 3.6"
-INSTALL_REQUIRES = ["numpy", "scipy", "torch", "torchvision", "Pillow", "closely"]
+INSTALL_REQUIRES = ["numpy", "scipy", "torch>=1.0", "torchvision>=0.3", "Pillow", "closely"]
 EXTRAS_REQUIRE = {
     "docs": ["sphinx"],
     "tests": ["coverage", "pytest"],
