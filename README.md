@@ -266,7 +266,7 @@ The following dependencies are required for the interactive deleting interface:
 - pymongodb
 - fastcluster
 - flask
-- jinja
+- jinja2
 - dnspython
 - python-magic
 - termcolor

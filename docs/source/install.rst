@@ -31,6 +31,13 @@ Installation with pip should also include all dependencies, but a complete list 
 - closely_
 - torch_
 - torchvision_
+- pymongodb
+- fastcluster
+- flask
+- jinja2
+- dnspython
+- python-magic
+- termcolor
 
 The optional web and :ref:`simages command line interface <cli>` requires installing mongodb::
 
@@ -39,10 +46,6 @@ The optional web and :ref:`simages command line interface <cli>` requires instal
     sudo systemctl disable mongodb.service
     # Stop Mongo service
     sudo service mongodb stop
-
-To install optional dependencies (PyMongo and Flask) run::
-
-  pip install 'simages[all]'
 
 
 .. _GitHub: https://github.com/justinshenk/simages
