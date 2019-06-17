@@ -66,12 +66,7 @@ CLASSIFIERS = [
 ]
 
 PYTHON_REQUIRES = ">= 3.6"
-INSTALL_REQUIRES = ["numpy", "scipy", "torch>=1.0", "torchvision>=0.3", "Pillow", "closely"]
-EXTRAS_REQUIRE = {
-    "docs": ["sphinx"],
-    "tests": ["coverage", "pytest"],
-    "all": [
-        "pymongo",
+INSTALL_REQUIRES = ["numpy", "scipy", "torch>=1.0", "torchvision>=0.3", "Pillow", "closely", "pymongo",
         "flask",
         "jinja>=2.10.1",
         "more-itertools",
@@ -81,12 +76,14 @@ EXTRAS_REQUIRE = {
         "Werkzeug",
         "python-magic",
         "termcolor",
-    ],
+]
+EXTRAS_REQUIRE = {
+    "docs": ["sphinx"],
+    "tests": ["coverage", "pytest"],
 }
 EXTRAS_REQUIRE["dev"] = (
     EXTRAS_REQUIRE["tests"]
     + EXTRAS_REQUIRE["docs"]
-    + EXTRAS_REQUIRE["all"]
     + ["wheel", "pre-commit"]
 )
 

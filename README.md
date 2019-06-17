@@ -32,25 +32,25 @@ cd simages
 pip install .
 ```
 
-To install the web interface, [install mongodb](https://docs.mongodb.com/manual/installation/) and use rather `pip install "simages[all]"`.
+To install the interactive interface, [install mongodb](https://docs.mongodb.com/manual/installation/) and use rather `pip install "simages[all]"`.
 
 ### Demo
 
-```simages-show```:
+1. Minimal command-line interface with ```simages-show```:
 
 ![simages_demo](images/simages_demo.gif)
 
-```simages add/find```:
+2. Interactive image deletion with ```simages add/find```:
 ![simages_web_demo](images/screenshot_server.png)
 
 ### Usage
 
 Two interfaces exist:
 
-- matplotlib interface which plots the duplicates for visual inspection
-- mongodb + web server interace which allows interactive deletion [optional]
+1. matplotlib interface which plots the duplicates for visual inspection
+2. mongodb + flask interface which allows interactive deletion [optional]
  
-#### Matplotlib interface
+#### Minimal interface
 
 In your console, enter the directory with images and use `simages-show`:
 
