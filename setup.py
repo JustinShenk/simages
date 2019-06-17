@@ -68,7 +68,7 @@ CLASSIFIERS = [
 PYTHON_REQUIRES = ">= 3.6"
 INSTALL_REQUIRES = ["numpy", "scipy", "torch>=1.0", "torchvision>=0.3", "Pillow", "closely", "pymongo",
         "flask",
-        "jinja>=2.10.1",
+        "jinja2>=2.10",
         "more-itertools",
         "pymongo",
         "Flask-Cors",
