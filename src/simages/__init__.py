@@ -6,7 +6,7 @@ from .embeddings import Embeddings, linkageplot
 from .extractor import EmbeddingExtractor
 from .main import find_duplicates
 
-__version__ = "19.0.2.post0"
+__version__ = "19.0.2.post1"
 
 __title__ = "simages"
 __description__ = "Find similar images in a dataset"
