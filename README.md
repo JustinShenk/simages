@@ -11,14 +11,7 @@ corresponding embedding distance.
 
 ### Install
 
-See the [installation docs](https://simages.readthedocs.io/en/latest/install.html) for all details. *simages* depends on
-the following packages:
-
-- [closely](https://github.com/justinshenk/closely)
-- [torch](https://pytorch.org)
-- [torchvision](https://pytorch.org)
-- scikit-learn
-- matplotlib
+See the [installation docs](https://simages.readthedocs.io/en/latest/install.html) for all details. 
 
 ```bash
 pip install simages
@@ -256,6 +249,27 @@ Specify tne number of pairs to identify with the parameter `n`.
 ### How it works
 
 *simages* uses a convolutional autoencoder with PyTorch and compares the latent representations with [closely](https://github.com/justinshenk/closely) :triangular_ruler:.
+
+#### Dependencies
+
+*simages* depends on
+the following packages:
+
+- [closely](https://github.com/justinshenk/closely)
+- [torch](https://pytorch.org)
+- [torchvision](https://pytorch.org)
+- scikit-learn
+- matplotlib
+
+Optional dependencies, installed with `pip install simages[all]` include:
+
+- pymongodb
+- fastcluster
+- flask
+- jinja
+- dnspython
+- python-magic
+- termcolor
 
 ### Cite
 
