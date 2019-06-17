@@ -40,10 +40,10 @@ To install the interactive interface, [install mongodb](https://docs.mongodb.com
 
 Two interfaces exist:
 
-1. matplotlib interface which plots the duplicates for visual inspection
+1. minimal interface which plots the duplicates for visual inspection
 2. mongodb + flask interface which allows interactive deletion [optional]
  
-#### Minimal interface
+#### Minimal Interface
 
 In your console, enter the directory with images and use `simages-show`:
 
