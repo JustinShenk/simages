@@ -48,6 +48,7 @@ class EmbeddingExtractor:
         num_epochs: int = 2,
         batch_size: int = 32,
         show: bool = False,
+        plot_embeddings=False,
         show_path: bool = False,
         show_train: bool = False,
         z_dim: int = 8,
@@ -133,6 +134,7 @@ class EmbeddingExtractor:
 
         if isinstance(input, str):
             data_dir = os.path.abspath(input)
+            self.root = data_dir
             self.train_dataset = ImageFolder(
                 data_dir, transform=train_transforms, is_valid_file=is_valid
             )
@@ -171,8 +173,16 @@ class EmbeddingExtractor:
         self._distance = nn.MSELoss()
         self._optimizer = torch.optim.Adam(self.model.parameters(), weight_decay=1e-5)
 
-        self.train()
-        self.eval()
+        embeddings_path = f'embeddings_epochs-{num_epochs}.npy'
+        if not os.path.exists(embeddings_path):
+            self.train()
+            self.eval()
+            np.save(embeddings_path, self.embeddings)
+        else:
+            logging.INFO("skipping training, loading embeddings from file")
+            self.embeddings = np.load(embeddings_path)
+            logging.INFO(f"Embeddings shape {self.embeddings.shape}")
+
 
     def _truncate_middle(self, string: str, n: int) -> str:
         if len(string) <= n:
@@ -370,6 +380,47 @@ class EmbeddingExtractor:
             indices = [indices]
         tensors = [self.get_image(idx) for idx in indices]
         self.show(torchvision.utils.make_grid(tensors), title=title)
+
+
+    def plot_embeddings(self, title=""):
+        """Plot embeddings (from validation data), hover to see image using bokeh"""
+        from bokeh.models import ColumnDataSource, HoverTool
+        from bokeh.plotting import figure, show
+        embeddings = self.embeddings
+        validation_image_paths = self.evalloader.dataset.samples
+
+        # Create scatter plot of embeddings
+        source = ColumnDataSource(
+        data=dict(
+            x=embeddings[:, 0],
+            y=embeddings[:, 1],
+            image_path=validation_image_paths,
+            image_path_relative=[os.path.relpath(p, self.root) for p in validation_image_paths],
+            )
+        )
+        hover = HoverTool(
+            tooltips="""
+            <div>
+                <div>
+                    <img src="@image_path" height="128" alt="@image_path" width="128" style="float: left; margin: 0px 15px 15px 0px; image-rendering: pixelated;"></img>
+                    @image_path_relative
+                </div>
+            </div>
+            """
+        )
+        p = figure(
+            plot_width=800,
+            plot_height=800,
+            title=title,
+            tools=[hover, "pan", "wheel_zoom", "box_zoom", "reset", "save"],
+        )
+        p.circle("x", "y", size=5, source=source, fill_alpha=0.8)
+        show(p)
+
+
+    def get_embedding(self, index: int) -> torch.Tensor:
+        """Get embedding at `index` of eval/embedding"""
+        return torch.Tensor(self.embeddings[index])
 
     def image_paths(self, indices, short=True):
         """Get path to image at `index` of eval/embedding

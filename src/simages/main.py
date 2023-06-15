@@ -61,6 +61,12 @@ def build_parser():
         help="Folder containing image data",
     )
     parser.add_argument(
+        "--plot-embeddings",
+        action="store_true",
+        default=None,
+        help="Plot embeddings of images",
+    )
+    parser.add_argument(
         "--show-train",
         "-t",
         action="store_true",
@@ -114,6 +120,7 @@ def find_duplicates(
     num_epochs: int = 2,
     num_channels: int = 3,
     show: bool = False,
+    plot_embeddings = False,
     show_train: bool = False,
     show_path: bool = True,
     z_dim: int = 8,
@@ -137,12 +144,15 @@ def find_duplicates(
         distances (np.ndarray): distances of each pair to each other
 
     """
+    # saved_vectors = os.path.join(input, "saved_vectors.npy")
+    # if not os.path.exists(saved_vectors):
     if isinstance(input, np.ndarray):
         extractor = EmbeddingExtractor(
             input=input,
             num_epochs=num_epochs,
             num_channels=num_channels,
             show=show,
+            plot_embeddings=plot_embeddings,
             show_train=show_train,
             z_dim=z_dim,
             **kwargs
@@ -153,6 +163,7 @@ def find_duplicates(
             num_epochs=num_epochs,
             num_channels=num_channels,
             show=show,
+            plot_embeddings=plot_embeddings,
             show_train=show_train,
             show_path=show_path,
             z_dim=z_dim,
@@ -161,6 +172,10 @@ def find_duplicates(
 
     if show:
         pairs, distances = extractor.show_duplicates(n=n)
+    if plot_embeddings:
+        extractor.plot_embeddings()
+        # save vectors
+        # np.save(saved_vectors, extractor.embeddings)
     else:
         pairs, distances = extractor.duplicates(n=n)
     return pairs, distances
@@ -176,6 +191,7 @@ def main():
         num_epochs=args.epochs,
         num_channels=args.num_channels,
         show=True,
+        plot_embeddings=args.plot_embeddings,
         show_train=args.show_train,
         show_path=True,
         metric="cosine",
