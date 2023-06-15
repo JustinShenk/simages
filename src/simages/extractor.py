@@ -396,6 +396,7 @@ class EmbeddingExtractor:
             return paths[0] # backward compatibility
         return paths
 
+    @torch.no_grad()
     def show_duplicates(self, n=5, path=False) -> (np.ndarray, np.ndarray):
         """Show duplicates from comparison of embeddings. Uses `closely` package to get pairs.
 
