@@ -177,12 +177,12 @@ class EmbeddingExtractor:
         if not os.path.exists(embeddings_path):
             self.train()
             self.eval()
-            logging.info(f"saving embeddings to {embeddings_path}")
+            log.info(f"saving embeddings to {embeddings_path}")
             np.save(embeddings_path, self.embeddings)
         else:
-            logging.info("skipping training, loading embeddings from file")
+            log.info("skipping training, loading embeddings from file")
             self.embeddings = np.load(embeddings_path)
-            logging.info(f"Embeddings shape {self.embeddings.shape}")
+            log.info(f"Embeddings shape {self.embeddings.shape}")
 
 
     def _truncate_middle(self, string: str, n: int) -> str:
