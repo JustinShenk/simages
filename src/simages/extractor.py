@@ -434,7 +434,7 @@ class EmbeddingExtractor:
             paths (str or list of str): paths to images in image folder
 
         """
-        if isinstance(indices, (int, np.int_)):
+        if isinstance(indices, (int, np.int_, np.int64)):  # <-- add np.int64 here
             indices = [indices]
 
         paths = []
@@ -445,7 +445,7 @@ class EmbeddingExtractor:
             paths.append(path)
 
         if len(paths) == 1:
-            return paths[0] # backward compatibility
+            return paths[0]  # backward compatibility
         return paths
 
     @torch.no_grad()

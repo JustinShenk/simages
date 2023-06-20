@@ -149,9 +149,11 @@ def find_pairs(paths, db, epochs: int) -> list:
     extractor = EmbeddingExtractor(path, num_epochs=epochs, metric="cosine")
     pairs, distances = extractor.duplicates(n=10)
 
+
     pairs_paths = [
-        [extractor.image_paths(ind, short=False) for ind in pair] for pair in pairs
+        [extractor.image_paths([ind], short=False) for ind in pair] for pair in pairs
     ]
+
 
     dups = []
     for idx, pair_paths in enumerate(pairs_paths):
