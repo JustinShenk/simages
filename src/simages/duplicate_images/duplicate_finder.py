@@ -139,7 +139,7 @@ def add(paths, db, num_processes=None):
         cprint("...done", "blue")
 
 
-def find_pairs(paths, db, epochs: int) -> list:
+def find_pairs(paths, db, epochs: int, pairs: int = 10) -> list:  # Default value for pairs is 10
     """Find similar pairs of images in `paths`. Train for `epochs`."""
     from simages import EmbeddingExtractor
 
@@ -147,13 +147,11 @@ def find_pairs(paths, db, epochs: int) -> list:
         path = paths[0]
     path = os.path.abspath(path)
     extractor = EmbeddingExtractor(path, num_epochs=epochs, metric="cosine")
-    pairs, distances = extractor.duplicates(n=10)
-
+    pairs, distances = extractor.duplicates(n=pairs)  # Use the pairs argument here
 
     pairs_paths = [
         [extractor.image_paths([ind], short=False) for ind in pair] for pair in pairs
     ]
-
 
     dups = []
     for idx, pair_paths in enumerate(pairs_paths):
@@ -184,6 +182,7 @@ def find_pairs(paths, db, epochs: int) -> list:
         )
 
     return dups
+
 
 
 def remove(paths, db):
