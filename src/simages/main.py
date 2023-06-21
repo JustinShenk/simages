@@ -16,7 +16,7 @@ Command line::
         simages remove <path> ... [--db=<db_path>]
         simages clear [--db=<db_path>]
         simages show [--db=<db_path>]
-        simages find <path> [--print] [--delete] [--match-time] [--trash=<trash_path>] [--db=<db_path>] [--epochs=<epochs>]
+        simages find <path> [--pairs=<num_pairs>] [--print] [--delete] [--match-time] [--trash=<trash_path>] [--db=<db_path>] [--epochs=<epochs>]
         simages -h | --help
     Options:
 
@@ -31,6 +31,7 @@ Command line::
                                   same capture times in order to be considered.
             --trash=<trash_path>  Where files will be put when they are deleted (default: ./Trash)
             --epochs=<epochs>     Epochs for training [default: 2]
+            --pairs=<num_pairs>   Number of pairs of images to show
 
 """
 
@@ -250,10 +251,8 @@ def cli():
         elif args["show"]:
             show(db)
         elif args["find"]:
-            # dups = find(db, match_time=args["--match-time"])
-            dups = find_pairs(args["<path>"], db=db, epochs=int(args["--epochs"]))
-            # Add similar images
-            # sims = find_similar(db)
+            pairs = int(args["--pairs"]) if args["--pairs"] else 10  # Default to 10 pairs if no value is provided
+            dups = find_pairs(args["<path>"], db=db, epochs=int(args["--epochs"]), pairs=pairs)  # assuming find_pairs function handles the pairs parameter.
             if args["--delete"]:
                 delete_duplicates(dups, db)
             elif args["--print"]:

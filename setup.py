@@ -70,7 +70,7 @@ INSTALL_REQUIRES = ["numpy", "scipy", "torch>=1.0", "torchvision>=0.3", "Pillow"
         "flask",
         "jinja2>=2.10",
         "more-itertools",
-        "pymongo",
+        "pymongo==3.7.0",
         "bokeh",
         "Flask-Cors",
         "dnspython",
