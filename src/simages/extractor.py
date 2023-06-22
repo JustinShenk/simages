@@ -414,7 +414,11 @@ class EmbeddingExtractor:
     def plot_embeddings(self, title="", path_colors=None):
         """Plot embeddings (from validation data), hover to see image using bokeh"""
         from bokeh.models import ColumnDataSource, HoverTool
-        from bokeh.plotting import figure, show
+        from bokeh.plotting import figure, show, output_file
+
+        if os.name == 'nt': # workaround for permissions issue
+            output_file('simages-show-script.html', title=title)
+
         embeddings = self.embeddings
         validation_image_paths = self.evalloader.dataset.samples
 
