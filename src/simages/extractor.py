@@ -16,6 +16,7 @@ import closely
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+from sklearn.decomposition import PCA
 import torch
 import torch.nn as nn
 import torchvision
@@ -425,6 +426,11 @@ class EmbeddingExtractor:
         colors = ['gray'] * len(validation_image_paths)
         if path_colors:
             colors = self.color_embeddings(validation_image_paths, path_colors=path_colors)
+
+        # Get PCA of embeddings
+        pca = PCA(n_components=2)
+        pca.fit(embeddings)
+        embeddings = pca.transform(embeddings)
 
         # Create scatter plot of embeddings
         source = ColumnDataSource(
