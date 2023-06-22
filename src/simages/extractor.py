@@ -55,7 +55,8 @@ class EmbeddingExtractor:
         metric: str = "cosine",
         model: Optional[torch.nn.Module] = None,
         db: Optional = None,
-        **kwargs,
+        embeddings_path: Optional[str] = False,
+        save_embeddings: Optional[bool] = False
     ):
         """Inits EmbeddingExtractor with input, either `str` or `np.ndarray`, performs training and validation.
 
@@ -71,7 +72,8 @@ class EmbeddingExtractor:
             metric (str): distance metric for :meth:`scipy.spatial.distance.cdist` (eg, euclidean, cosine, hamming, etc.)
             model (torch.nn.Module, optional): class implementing same methods as :class:`~simages.BasicAutoencoder`
             db_conn_string (str): Mongodb connection string
-            kwargs (dict)
+            embeddings_path (str): path to load embeddings
+            save_embeddings (str): saves embeddings in current directory
 
         """
         self.num_epochs = num_epochs
@@ -173,16 +175,18 @@ class EmbeddingExtractor:
         self._distance = nn.MSELoss()
         self._optimizer = torch.optim.Adam(self.model.parameters(), weight_decay=1e-5)
 
-        embeddings_path = f'embeddings_epochs-{num_epochs}.npy'
-        if not os.path.exists(embeddings_path):
-            self.train()
-            self.eval()
-            log.info(f"saving embeddings to {embeddings_path}")
-            np.save(embeddings_path, self.embeddings)
-        else:
+        if embeddings_path:
             log.info("skipping training, loading embeddings from file")
             self.embeddings = np.load(embeddings_path)
             log.info(f"Embeddings shape {self.embeddings.shape}")
+        else:
+            embeddings_path = f'embeddings_epochs-{num_epochs}.npy'
+            self.train()
+            self.eval()
+        if save_embeddings:
+            log.info(f"saving embeddings to {embeddings_path}")
+            np.save(embeddings_path, self.embeddings)
+
 
 
     def _truncate_middle(self, string: str, n: int) -> str:
@@ -322,6 +326,11 @@ class EmbeddingExtractor:
             n (int): number of pairs
             quantile (float): quantile of total combination (suggested range: 0.001 - 0.01)
         """
+        nr_embeddings = len(self.embeddings)
+        min_pairs = (nr_embeddings * (nr_embeddings - 1)) // 2
+
+        n = min(n, min_pairs)
+
         if quantile is not None:
             pairs, distances = closely.solve(
                 self.embeddings, quantile=quantile, metric=self._metric
@@ -383,12 +392,35 @@ class EmbeddingExtractor:
         self.show(torchvision.utils.make_grid(tensors), title=title)
 
 
-    def plot_embeddings(self, title=""):
+    def color_embeddings(self, image_paths, path_colors='train-blue_val-green'):
+        """Color embeddings by path, eg, 'train' or 'val'"""
+        colors = []
+        path_color_mapping = {}
+        for path_color in path_colors.split('_'):
+            path, color = path_color.split('-')
+            path_color_mapping[path] = color
+
+        # Iterate over each image path and assign a color based on the presence of 'train' or 'val'
+        for path in image_paths:
+            color = 'gray'
+            for directory, directory_color in path_color_mapping.items():
+                if directory in path:
+                    color = directory_color
+                    break
+
+            colors.append(color)
+        return colors
+
+    def plot_embeddings(self, title="", path_colors=None):
         """Plot embeddings (from validation data), hover to see image using bokeh"""
         from bokeh.models import ColumnDataSource, HoverTool
         from bokeh.plotting import figure, show
         embeddings = self.embeddings
         validation_image_paths = self.evalloader.dataset.samples
+
+        colors = ['gray'] * len(validation_image_paths)
+        if path_colors:
+            colors = self.color_embeddings(validation_image_paths, path_colors=path_colors)
 
         # Create scatter plot of embeddings
         source = ColumnDataSource(
@@ -397,6 +429,7 @@ class EmbeddingExtractor:
             y=embeddings[:, 1],
             image_path=validation_image_paths,
             image_path_relative=[os.path.relpath(p, self.root) for p in validation_image_paths],
+            colors=colors
             )
         )
         hover = HoverTool(
@@ -415,7 +448,7 @@ class EmbeddingExtractor:
             title=title,
             tools=[hover, "pan", "wheel_zoom", "box_zoom", "reset", "save"],
         )
-        p.circle("x", "y", size=5, source=source, fill_alpha=0.8)
+        p.circle("x", "y", size=5, source=source, fill_alpha=0.8, line_color='colors', fill_color='colors')
         show(p)
 
 

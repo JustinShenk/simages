@@ -68,6 +68,12 @@ def build_parser():
         help="Plot embeddings of images",
     )
     parser.add_argument(
+        "--path-colors",
+        type=str,
+        default=None,
+        help="Color embeddings by path (eg, train-blue_val-green)",
+    )
+    parser.add_argument(
         "--show-train",
         "-t",
         action="store_true",
@@ -106,6 +112,18 @@ def build_parser():
         default=8,
         help="Compression bits (bigger generally performs better but takes more time)",
     )
+    parser.add_argument(
+        "--embeddings-path",
+        type = str,
+        default=None,
+        help="Path to load embeddings from .npy file",
+    )
+    parser.add_argument(
+        "--save-embeddings",
+        action="store_true",
+        default=None,
+        help="Save embeddings to .npy file",
+    )
     return parser
 
 
@@ -122,9 +140,12 @@ def find_duplicates(
     num_channels: int = 3,
     show: bool = False,
     plot_embeddings = False,
+    path_colors = False,
     show_train: bool = False,
     show_path: bool = True,
     z_dim: int = 8,
+    embeddings_path: str = None,
+    save_embeddings: bool = False,
     db=None,
     **kwargs
 ) -> Tuple[np.ndarray, np.ndarray]:
@@ -156,6 +177,8 @@ def find_duplicates(
             plot_embeddings=plot_embeddings,
             show_train=show_train,
             z_dim=z_dim,
+            embeddings_path = embeddings_path,
+            save_embeddings = save_embeddings,
             **kwargs
         )
     elif isinstance(input, str):
@@ -174,7 +197,7 @@ def find_duplicates(
     if show:
         pairs, distances = extractor.show_duplicates(n=n)
     if plot_embeddings:
-        extractor.plot_embeddings()
+        extractor.plot_embeddings(path_colors=path_colors)
         # save vectors
         # np.save(saved_vectors, extractor.embeddings)
     else:
@@ -193,9 +216,12 @@ def main():
         num_channels=args.num_channels,
         show=True,
         plot_embeddings=args.plot_embeddings,
+        path_colors=args.path_colors,
         show_train=args.show_train,
         show_path=True,
         metric="cosine",
+        embeddings_path=args.embeddings_path,
+        save_embeddings=args.save_embeddings,
     )
 
 
