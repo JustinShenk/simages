@@ -443,8 +443,8 @@ class EmbeddingExtractor:
             """
         )
         p = figure(
-            plot_width=800,
-            plot_height=800,
+            width=800,
+            height=800,
             title=title,
             tools=[hover, "pan", "wheel_zoom", "box_zoom", "reset", "save"],
         )
