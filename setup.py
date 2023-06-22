@@ -77,6 +77,7 @@ INSTALL_REQUIRES = ["numpy", "scipy", "torch>=1.0", "torchvision>=0.3", "Pillow"
         "Werkzeug",
         "python-magic",
         "termcolor",
+        "scikit-learn",
 ]
 EXTRAS_REQUIRE = {
     "docs": ["sphinx"],
