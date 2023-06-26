@@ -10,7 +10,7 @@ import re
 ###############################################################################
 
 NAME = "simages"
-PACKAGES = find_packages(where="src", exclude=["duplicate_images"])
+PACKAGES = find_packages(where="src", exclude=["*duplicate_images*"])
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 ENTRY_POINTS = {
