@@ -1,4 +1,5 @@
 include *.rst *.txt tox.ini .coveragerc LICENSE .pre-commit-config.yaml pyproject.toml
+include src/simages/duplicate_images/template/index.html
 exclude .gitmodules appveyor.yml .readthedocs.yml .travis.yml codecov.yml
 graft tests
 graft .github

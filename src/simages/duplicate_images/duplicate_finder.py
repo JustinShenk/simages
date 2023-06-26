@@ -41,6 +41,7 @@ from flask_cors import CORS
 from jinja2 import FileSystemLoader, Environment
 
 import simages
+import json
 
 
 @contextmanager
@@ -194,6 +195,34 @@ def remove(paths, db):
             remove_image(file, db)
 
 
+def update_annotations(images_dir, image_filename):
+    # Construct the filepath for the _annotations.coco.json file
+    parent_dir = os.path.dirname(images_dir)
+    annotations_filepath = os.path.join(parent_dir, '_annotations.coco.json')
+
+    try:
+        with open(annotations_filepath, 'r') as f:
+            data = json.load(f)
+
+        # Find the image entry and remove it
+        images = data['images']
+        for image in images:
+            if image['file_name'] == image_filename:
+                images.remove(image)
+                image_id = image['id']
+                break
+
+        # Remove any annotations associated with the image
+        annotations = data['annotations']
+        annotations[:] = [a for a in annotations if a['image_id'] != image_id]
+
+        # Write the updated data back to the json file
+        with open(annotations_filepath, 'w') as f:
+            json.dump(data, f, indent=4)
+
+    except Exception as e:
+        print(f"Failed to update annotations in {annotations_filepath} after removing {image_filename}. Error: {e}")
+
 def remove_image(file, db):
     db.delete_one({"_id": file})
 
@@ -258,6 +287,7 @@ def delete_picture(file_name, db, trash="./Trash/"):
     try:
         shutil.move(file_name, trash + os.path.basename(file_name))
         remove_image(file_name, db)
+        update_annotations(os.path.dirname(file_name), os.path.basename(file_name))
     except FileNotFoundError:
         cprint("File not found {}".format(file_name), "red")
         return False
