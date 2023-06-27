@@ -529,6 +529,7 @@ class EmbeddingExtractor:
 
         return pairs, distances
 
+
     def unnormalize(self, image: torch.Tensor) -> torch.Tensor:
         """Unnormalize an image.
 
@@ -542,6 +543,7 @@ class EmbeddingExtractor:
         unorm = UnNormalize(mean=self._mean, std=self._std)
         return unorm(image)
 
+    @torch.no_grad()
     def decode(
         self,
         embedding: Optional[np.ndarray] = None,

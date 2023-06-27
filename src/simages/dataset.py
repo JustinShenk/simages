@@ -1,6 +1,6 @@
 import glob
 import os
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import numpy as np
 from torch.utils.data.dataset import Dataset
@@ -60,7 +60,7 @@ class ImageFolder(VisionDataset):
         self,
         root: str,
         loader: Callable = default_loader,
-        extensions: Optional[list] = None,
+        extensions: Optional[List[str]] = None,
         transform: Optional[list] = None,
         is_valid_file: Optional[Callable] = None,
     ):
