@@ -22,26 +22,25 @@ Options:
         --trash=<trash_path>  Where files will be put when they are deleted (default: ./Trash)
 """
 import concurrent
+import json
 import math
 import os
 import shutil
 import webbrowser
 from contextlib import contextmanager
+from pprint import pprint
 from subprocess import Popen, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
 
 import magic
-from PIL import ExifTags, Image
-from more_itertools import chunked
-from termcolor import cprint
-from pprint import pprint
 import pymongo
+import simages
+from PIL import ExifTags, Image
 from flask import Flask
 from flask_cors import CORS
 from jinja2 import FileSystemLoader, Environment
-
-import simages
-import json
+from more_itertools import chunked
+from termcolor import cprint
 
 
 @contextmanager
@@ -140,7 +139,9 @@ def add(paths, db, num_processes=None):
         cprint("...done", "blue")
 
 
-def find_pairs(paths, db, epochs: int, pairs: int = 10) -> list:  # Default value for pairs is 10
+def find_pairs(
+    paths, db, epochs: int, pairs: int = 10
+) -> list:  # Default value for pairs is 10
     """Find similar pairs of images in `paths`. Train for `epochs`."""
     from simages import EmbeddingExtractor
 
@@ -185,7 +186,6 @@ def find_pairs(paths, db, epochs: int, pairs: int = 10) -> list:  # Default valu
     return dups
 
 
-
 def remove(paths, db):
     for path in paths:
         files = get_image_files(path)
@@ -198,30 +198,33 @@ def remove(paths, db):
 def update_annotations(images_dir, image_filename):
     # Construct the filepath for the _annotations.coco.json file
     parent_dir = os.path.dirname(images_dir)
-    annotations_filepath = os.path.join(parent_dir, '_annotations.coco.json')
+    annotations_filepath = os.path.join(parent_dir, "_annotations.coco.json")
 
     try:
-        with open(annotations_filepath, 'r') as f:
+        with open(annotations_filepath, "r") as f:
             data = json.load(f)
 
         # Find the image entry and remove it
-        images = data['images']
+        images = data["images"]
         for image in images:
-            if image['file_name'] == image_filename:
+            if image["file_name"] == image_filename:
                 images.remove(image)
-                image_id = image['id']
+                image_id = image["id"]
                 break
 
         # Remove any annotations associated with the image
-        annotations = data['annotations']
-        annotations[:] = [a for a in annotations if a['image_id'] != image_id]
+        annotations = data["annotations"]
+        annotations[:] = [a for a in annotations if a["image_id"] != image_id]
 
         # Write the updated data back to the json file
-        with open(annotations_filepath, 'w') as f:
+        with open(annotations_filepath, "w") as f:
             json.dump(data, f, indent=4)
 
     except Exception as e:
-        print(f"Failed to update annotations in {annotations_filepath} after removing {image_filename}. Error: {e}")
+        print(
+            f"Failed to update annotations in {annotations_filepath} after removing {image_filename}. Error: {e}"
+        )
+
 
 def remove_image(file, db):
     db.delete_one({"_id": file})
